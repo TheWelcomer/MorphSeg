@@ -46,9 +46,9 @@ import torch
 from settings import Settings
 
 settings = Settings(
-        name="pos_test", save_path="saved_models/test", loss="crf",
-        device=torch.device("cuda:0"), report_progress_every=100, epochs=30, tau=1
-    )
+    name="pos_test", save_path="pretrained_models/test", loss="crf",
+    device=torch.device("cuda:0"), report_progress_every=100, epochs=30, tau=1
+)
 ```
 
 The most important hyperparameter is `loss`, which defines which type of sequence labelling

@@ -29,24 +29,37 @@ class Segmenter:
         if self.train_from_scratch is True:
             self.sequence_labeller = None
             return
-        self.settings =
-        self.model = SequenceLabeller.load(f"saved_models/{lang}_model")
-        self.model = None
+        self.sequence_labeller = SequenceLabeller.load(f"pretrained_models/{lang}.pt")
 
-    def train_model(self):
-        train(self.lang)
+    def segment(self, input_sequence, output_string=False, delimiter=" @@"):
+        if self.sequence_labeller is None:
+            raise RuntimeError("Model not trained. Please train the model before segmentation.")
+        if type(input_sequence) is not str:
+            raise ValueError("Input sequence must be a string.")
+        if type(output_string) is not bool:
+            raise ValueError("output_string must be a boolean.")
+        if type(delimiter) is not str:
+            raise ValueError("Delimiter must be a string.")
+        if input_sequence == "":
+            return []
 
-    def load_model(self, model_path):
-        self.model = SequenceLabeller.load(model_path)
+        # Extract all words
+        words = re.findall(r"[a-zA-Z'-]+", text)
+        words = [list(word.lower()) for word in words]
+        # Process all words at once
+        actions = self.sequence_labeller.predict(sources=words).prediction
+        predicted_segmentations = [rules2sent_strict(source=words[i], actions=actions[i]).replace(" @@", delimiter) for i in range(len(words))]
+        if output_string is True:
+            # Create iterator for transformed words
+            word_iter = iter(transformed_words)
+            # Replace each match with next transformed word
+            return re.sub(r"[a-zA-Z'-]+", lambda m: next(word_iter), text)
+        if output_string is False:
+            return [predicted_segmentations.split(delimiter) for word in predicted_segmentations]
 
-    def segment(self, input_sequence):
-        if self.model is None:
-            raise ValueError("Model not loaded. Please load a model before segmentation.")
-        prediction = self.model.predict([input_sequence])[0]
-        target_seq = prediction.prediction
-        source_seq = [prediction.alignment[i].symbol for i in range(len(prediction.alignment))]
-        segmented_output = rules2sent_strict(source_seq, target_seq)
-        return segmented_output
+
+
+
 
 def train(lang):
     if not os.path.exists(f'data/processed_data/{lang}/train.csv') or not os.path.exists(f'data/processed_data/{lang}/test.csv'):
@@ -76,7 +89,7 @@ def train(lang):
     # Initialize settings
     settings = Settings(
         name=f"{lang}",
-        save_path=f"saved_models/",
+        save_path=f"pretrained_models/",
         loss="crf",
         device=torch.device("cuda"),
         report_progress_every=1000,
