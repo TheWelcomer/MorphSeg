@@ -11,7 +11,7 @@
 </script> 
 
 <div id=cutting-board>
-<input value={input} />
+<input value={input} id=cutting-board-input/>
 </div>
 
 <style>

@@ -7,12 +7,13 @@
 }
 #cutting-board {
     background-color: #7f6453;
-    height: 80%;
+    height: 80vh;
     width: 80%;
     margin: auto;
 }
-input {
-    height: 50%;
-    width: 60%;
+#cutting-board-input {
+    background-color: transparent;
+    height: 99%;
+    width: 99%;
     margin: auto;
 }
