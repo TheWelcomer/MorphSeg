@@ -4,9 +4,19 @@
 
 (setv frontend-path "../frontend/build")
 
+(defmacro serve-page [title]
+  `(defn [(app.route (+ "/" ~(str title)))]
+         ~title []
+         (send_from_directory
+           frontend-path 
+           (+ ~(str title)
+              ".html"))))
+
 (defn [(app.route "/")]
       index []
       (send_from_directory frontend-path "index.html"))
+
+(serve-page showcase)
 
 (defn [(app.route "/<path:path>")]
       files [path]
