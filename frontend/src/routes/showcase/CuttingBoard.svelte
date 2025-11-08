@@ -31,7 +31,9 @@
     <div id="word-container">
       {#each words as word}
         <span class="word">
-          {word}
+          <span>
+            {word}
+          </span>
         </span>&nbsp<span class="word-spacer" />
       {/each}
     </div>
@@ -54,7 +56,12 @@
 
   .word {
     display: inline-block;
+    margin: 0.25em 0 0.25em 0;
+  }
+
+  .word > span {
     background-color: blue;
+    padding: 0.1em;
   }
 
   .word-spacer {
