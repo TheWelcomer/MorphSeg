@@ -7,7 +7,7 @@ class Settings:
     def __init__(self, name: str, save_path: str, epochs: int = 1, batch_size: int = 32,
                  device: torch.device = torch.device("cpu"), scheduler: str = "exponential", gamma: float = 1.0,
                  verbose: bool = True, report_progress_every: int = 1, main_metric: str = "wer",
-                 keep_only_best_checkpoint: bool = True, optimizer: str = "adam", lr: float = 0.001,
+                 keep_only_best_checkpoint: bool = True, optimizer: str = "adam", lr: float = 1e-3,
                  weight_decay: float = 0.0, grad_clip: Optional[float] = None, embedding_size: int = 64,
                  hidden_size: int = 128, num_layers: int = 1, dropout: float = 0.0, tau: int = 1,
                  loss: str = "cross-entropy", use_features: bool = False, feature_embedding_size: int = 32,

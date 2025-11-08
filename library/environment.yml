@@ -16,7 +16,6 @@ dependencies:
   - packaging=25.0
   - typing-extensions=4.15.0
   - requests=2.32.5
-  - certifi=2025.10.5
 
   # Pip dependencies - Core only
   - pip:
@@ -37,7 +36,6 @@ dependencies:
 
     # === UTILITIES (let pip resolve versions) ===
     - tqdm==4.67.1
-    - edit_distance==1.0.7
     - rich==14.2.0
     - editdistance==0.8.1
     - python-dotenv==1.2.1
