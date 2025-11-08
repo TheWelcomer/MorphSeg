@@ -1,19 +1,28 @@
 @font-face {
     font-family: nokia;
     src: url("/assets/nokia_cellphone/nokiafc22.ttf");
-}
-* {
+} * {
     font-family: nokia;
-}
-#cutting-board {
+} #cutting-board {
     background-color: #7f6453;
-    height: 80vh;
+    height: 75vh;
     width: 80%;
-    margin: auto;
-}
-#cutting-board-input {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 7.5vh;
+} #cutting-board-input {
     background-color: transparent;
+    padding-left: 1em;
+    padding-right: 1em;
+    border: none;
     height: 99%;
-    width: 99%;
+    width: 97%;
     margin: auto;
+} button {
+    background-color: #a2de96;
+    padding: 1em;
+    margin-left: auto;
+    margin-right: auto;
+} html {
+    background-color: #747a8a;
 }
