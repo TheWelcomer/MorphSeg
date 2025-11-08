@@ -1,19 +1,17 @@
 <script>
-  let input = $state("What the Segma?");
-  let output = $state("")
+  import CuttingBoard from './CuttingBoard.svelte'
 
-  function segment(text) {
-    return text.split(" ").map((word)=>word.split(""));
-  }
-
+  let cuttingBoard
 </script>
 
-<div id=cutting-board>
-<input value={input} style="background: red"/>
-</div>
-<button onclick={()=>{output = segment(input); console.log(segment(input))}}>
+<CuttingBoard bind:this={cuttingBoard} />
+
+<br>
+
+<button onclick={()=>{cuttingBoard.startAnimation()}}>
   #mybutton
 </button>
-<br>
-Segmented: {output}
 
+<style>
+  @import "./style.css";
+</style>
