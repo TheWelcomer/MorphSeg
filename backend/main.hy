@@ -2,7 +2,7 @@
 
 (setv app (Flask __name__))
 
-(setv frontend-path "../frontend/dist")
+(setv frontend-path "../frontend/build")
 
 (defn [(app.route "/")]
       index []
