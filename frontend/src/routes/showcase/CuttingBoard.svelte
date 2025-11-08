@@ -9,8 +9,7 @@
   let words = $state(splitWords(input));
   
   function splitWords(text) {
-    return text.split(" ")
-               .map(word=>word + " ");
+    return text.replace(/\s/g, " ").split(" ");
   }
 
   function segment(text) {
@@ -27,13 +26,13 @@
 
 <div id=cutting-board>
   {#if stage == Stage.BEFORE}
-    <input id=cutting-board-input bind:value={input} />
+    <div id=cutting-board-input bind:innerText={input} contenteditable=true />
   {:else if stage == Stage.WORDS}
     <div id="word-container">
       {#each words as word}
         <span class="word">
           {word}
-        </span>
+        </span>&nbsp<span class="word-spacer" />
       {/each}
     </div>
   {/if}
@@ -50,10 +49,27 @@
 
   #word-container {
     width: 100%;
+    margin: 2em;  
   }
 
   .word {
     display: inline-block;
     background-color: blue;
+  }
+
+  .word-spacer {
+    animation: 1s ease-out 0.2s 1 both expand;
+    animation-iteration-count: 1;
+    background-color: red;
+    display: inline-block;
+  }
+
+  @keyframes expand {
+    from {
+      width: 0em;
+    }
+    to {
+      width: 1em;
+    }
   }
 </style>

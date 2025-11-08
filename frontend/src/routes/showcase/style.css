@@ -11,9 +11,16 @@
     width: 80%;
     margin: auto;
 }
+
+#cutting-board * {
+    font-size: 4vh;
+}
+
 #cutting-board-input {
+    margin: 2em;
     background-color: transparent;
-    height: 99%;
-    width: 99%;
-    margin: auto;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
 }
