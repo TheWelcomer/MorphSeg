@@ -7,58 +7,10 @@ from dotenv import load_dotenv
 import ast
 from oracle import rules2sent_strict, run_oracle
 import os
+import re
+from segmenter import Segmenter
 
 os.putenv("KMP_DUPLICATE_LIB_OK", "TRUE")
-
-class Segmenter:
-    def __init__(self, lang, train_from_scratch=False):
-        self.lang = lang
-        self.train_from_scratch = train_from_scratch
-        if type(lang) is not str:
-            raise ValueError("Language must be a string.")
-        if type(train_from_scratch) is not bool:
-            raise ValueError("train_from_scratch must be a boolean.")
-        pretrained_model_langs = ["eng"]
-        if lang not in pretrained_model_langs and train_from_scratch is False:
-            print(f"'{lang}' does not have a pretrained model. You must train from scratch using the train method.")
-            self.train_from_scratch = True
-        if lang in pretrained_model_langs and train_from_scratch is False:
-            print(f"Loading pretrained model for language '{lang}'.")
-        if train_from_scratch is True:
-            print(f"Training model from scratch for language '{lang}'.")
-        if self.train_from_scratch is True:
-            self.sequence_labeller = None
-            return
-        self.sequence_labeller = SequenceLabeller.load(f"pretrained_models/{lang}.pt")
-
-    def segment(self, input_sequence, output_string=False, delimiter=" @@"):
-        if self.sequence_labeller is None:
-            raise RuntimeError("Model not trained. Please train the model before segmentation.")
-        if type(input_sequence) is not str:
-            raise ValueError("Input sequence must be a string.")
-        if type(output_string) is not bool:
-            raise ValueError("output_string must be a boolean.")
-        if type(delimiter) is not str:
-            raise ValueError("Delimiter must be a string.")
-        if input_sequence == "":
-            return []
-
-        # Extract all words
-        words = re.findall(r"[a-zA-Z'-]+", text)
-        words = [list(word.lower()) for word in words]
-        # Process all words at once
-        actions = self.sequence_labeller.predict(sources=words).prediction
-        predicted_segmentations = [rules2sent_strict(source=words[i], actions=actions[i]).replace(" @@", delimiter) for i in range(len(words))]
-        if output_string is True:
-            # Create iterator for transformed words
-            word_iter = iter(transformed_words)
-            # Replace each match with next transformed word
-            return re.sub(r"[a-zA-Z'-]+", lambda m: next(word_iter), text)
-        if output_string is False:
-            return [predicted_segmentations.split(delimiter) for word in predicted_segmentations]
-
-
-
 
 
 def train(lang):
@@ -125,4 +77,8 @@ def train(lang):
 
 
 if __name__ == "__main__":
-    train("eng")
+    segmenter = Segmenter(lang="eng")
+    input_text = "The unbelievably disagreeable preprocessor unsuccessfully reprocessed the unquestionably irreversible decontextualization"
+    segmented_text = segmenter.segment(input_text, output_string=True, delimiter=" @@")
+    print("Original Text: ", input_text)
+    print("Segmented Text: ", segmented_text)

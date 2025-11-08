@@ -23,8 +23,8 @@ class SequenceLabeller:
         _, self.inference = _get_loss_function(self.settings.loss)
 
     @classmethod
-    def load(cls, path: str) -> SequenceLabeller:
-        model = load_model(path=path)
+    def load(cls, path: str, device) -> SequenceLabeller:
+        model = load_model(path, device)
         sequence_labeller = cls(settings=model.settings)
         sequence_labeller.model = model
 

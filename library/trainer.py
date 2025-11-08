@@ -159,8 +159,8 @@ def save_model(model: TrainedModel, name: str, path: str) -> str:
     return save_model_path
 
 
-def load_model(path: str) -> TrainedModel:
-    model_save_info = torch.load(path, weights_only=False)
+def load_model(path: str, device) -> TrainedModel:
+    model_save_info = torch.load(path, weights_only=False, map_location=device)
 
     model = model_save_info["model_class"](**model_save_info["parameters"])
     model.load_state_dict(model_save_info["state_dict"])
