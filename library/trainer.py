@@ -24,7 +24,6 @@ from inference import argmax_decode, viterbi_decode, ctc_crf_decode
 from loss import ctc_loss, crf_loss, cross_entropy_loss, ctc_crf_loss
 from torch.optim.lr_scheduler import ExponentialLR, OneCycleLR
 
-
 Sequence = List[str]
 Sequences = List[Sequence]
 TrainData = Tuple[Sequences, Sequences]
@@ -161,7 +160,7 @@ def save_model(model: TrainedModel, name: str, path: str) -> str:
 
 
 def load_model(path: str) -> TrainedModel:
-    model_save_info = torch.load(path)
+    model_save_info = torch.load(path, weights_only=False)
 
     model = model_save_info["model_class"](**model_save_info["parameters"])
     model.load_state_dict(model_save_info["state_dict"])
@@ -287,7 +286,6 @@ def train(train_data: RawDataset, development_data: Optional[RawDataset], settin
 
         for batch in train_dataloader:
             optimizer.zero_grad()
-
             loss = get_loss(model=model, batch=batch, reduction="mean").loss
 
             # Update parameters

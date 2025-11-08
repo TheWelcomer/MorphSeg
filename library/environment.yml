@@ -40,3 +40,4 @@ dependencies:
     - edit_distance==1.0.7
     - rich==14.2.0
     - editdistance==0.8.1
+    - python-dotenv==1.2.1

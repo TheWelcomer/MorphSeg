@@ -2,10 +2,6 @@ import pandas as pd
 import os
 
 def sent2rules_strict(source, target):
-    if type(source) is not str or type(target) is not str:
-        print("Non-string input to sent2rules_strict")
-        return [], []
-
     if len(source) == 0:
         return [], []
 
@@ -123,6 +119,7 @@ def rules2sent_strict(source, actions):
 
 # Comprehensive test suite
 def run_oracle(lang, split):
+    print(f"Running oracle for language: {lang}, split: {split}")
     label_set = set()
     sources = []
     targets = []
@@ -131,20 +128,21 @@ def run_oracle(lang, split):
 
     passed = 0
     failed = 0
-    skipped = 0
-
-    print("=" * 80)
-    print("COMPREHENSIVE TEST SUITE")
-    print("=" * 80)
+    non_string_skip = 0
+    empty_source_skip = 0
 
     for tuple in test_cases:
         source = tuple[0]
         target = tuple[1]
+
+        # Skip non-string cases
+        if type(source) is not str or type(target) is not str:
+            non_string_skip += 1
+            continue
+
         # Skip empty source cases
         if len(source) == 0:
-            print(f"  Source: '{source}' (empty) → Target: '{target}'")
-            print()
-            skipped += 1
+            empty_source_skip += 1
             continue
 
         try:
@@ -164,35 +162,37 @@ def run_oracle(lang, split):
             for i, (char, action) in enumerate(zip(input_chars, actions)):
                 assert char == source[i], f"Input char mismatch at position {i}"
 
-            print(f"✓ PASS")
-            print(f"  Source: '{source}' → Target: '{target}'")
-            print(f"  Actions: {actions[:10]}{'...' if len(actions) > 10 else ''}")
-            print()
+            # print(f"✓ PASS")
+            # print(f"  Source: '{source}' → Target: '{target}'")
+            # print(f"  Actions: {actions[:10]}{'...' if len(actions) > 10 else ''}")
+            # print()
             passed += 1
 
         except Exception as e:
-            print(f"✗ FAIL")
-            print(f"  Source: '{source}' → Target: '{target}'")
-            print(f"  Error: {e}")
-            print()
+            # print(f"✗ FAIL")
+            # print(f"  Source: '{source}' → Target: '{target}'")
+            # print(f"  Error: {e}")
+            # print()
             failed += 1
 
     # Label Set
-    print("=" * 80)
-    print("LABEL SET")
-    print("=" * 80)
-    print(sorted(label_set))
-    print(f"Total unique labels: {len(label_set)}")
-    print("=" * 80)
+    # print("=" * 80)
+    # print("LABEL SET")
+    # print("=" * 80)
+    # print(sorted(label_set))
+    # print(f"Total unique labels: {len(label_set)}")
+    # print("=" * 80)
 
     # Summary
     print("=" * 80)
-    print("TEST SUMMARY")
+    print(f"{lang.upper()} - {split.upper()} SET ACTION LABEL GENERATION RESULTS")
     print("=" * 80)
     print(f"Total tests: {len(test_cases)}")
     print(f"Passed: {passed}")
     print(f"Failed: {failed}")
-    print(f"Skipped: {skipped}")
+    print(f"# Non-String Entries (Skipped): {non_string_skip}")
+    print(f"# Empty Source Entries (Skipped): {empty_source_skip}")
+    print(f"Total unique labels: {len(label_set)}")
     print(
         f"Success rate: {passed}/{passed + failed} ({100 * passed / (passed + failed) if passed + failed > 0 else 0:.1f}%)")
     print("=" * 80)
@@ -204,4 +204,4 @@ def run_oracle(lang, split):
 
 
 if __name__ == "__main__":
-    run_oracle("ces", "test")
+    run_oracle("eng", "train")
