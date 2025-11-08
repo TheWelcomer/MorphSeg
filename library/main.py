@@ -10,6 +10,44 @@ import os
 
 os.putenv("KMP_DUPLICATE_LIB_OK", "TRUE")
 
+class Segmenter:
+    def __init__(self, lang, train_from_scratch=False):
+        self.lang = lang
+        self.train_from_scratch = train_from_scratch
+        if type(lang) is not str:
+            raise ValueError("Language must be a string.")
+        if type(train_from_scratch) is not bool:
+            raise ValueError("train_from_scratch must be a boolean.")
+        pretrained_model_langs = ["eng"]
+        if lang not in pretrained_model_langs and train_from_scratch is False:
+            print(f"'{lang}' does not have a pretrained model. You must train from scratch using the train method.")
+            self.train_from_scratch = True
+        if lang in pretrained_model_langs and train_from_scratch is False:
+            print(f"Loading pretrained model for language '{lang}'.")
+        if train_from_scratch is True:
+            print(f"Training model from scratch for language '{lang}'.")
+        if self.train_from_scratch is True:
+            self.sequence_labeller = None
+            return
+        self.settings =
+        self.model = SequenceLabeller.load(f"saved_models/{lang}_model")
+        self.model = None
+
+    def train_model(self):
+        train(self.lang)
+
+    def load_model(self, model_path):
+        self.model = SequenceLabeller.load(model_path)
+
+    def segment(self, input_sequence):
+        if self.model is None:
+            raise ValueError("Model not loaded. Please load a model before segmentation.")
+        prediction = self.model.predict([input_sequence])[0]
+        target_seq = prediction.prediction
+        source_seq = [prediction.alignment[i].symbol for i in range(len(prediction.alignment))]
+        segmented_output = rules2sent_strict(source_seq, target_seq)
+        return segmented_output
+
 def train(lang):
     if not os.path.exists(f'data/processed_data/{lang}/train.csv') or not os.path.exists(f'data/processed_data/{lang}/test.csv'):
         run_oracle(lang, "train")
