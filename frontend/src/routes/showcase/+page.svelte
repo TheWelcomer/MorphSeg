@@ -9,7 +9,7 @@
 </script>
 
 <div id=cutting-board>
-<input value={input} style="background: red"/>
+<input value={input}/>
 </div>
 <button onclick={()=>{output = segment(input); console.log(segment(input))}}>
   #mybutton
@@ -17,3 +17,6 @@
 <br>
 Segmented: {output}
 
+<style>
+@import "./style.css";
+</style>
