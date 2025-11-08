@@ -8,8 +8,7 @@ import ast
 from oracle import rules2sent_strict, run_oracle
 import os
 
-load_dotenv(override=True)
-
+os.putenv("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 def train(lang):
     if not os.path.exists(f'data/processed_data/{lang}/train.csv') or not os.path.exists(f'data/processed_data/{lang}/test.csv'):
@@ -38,13 +37,17 @@ def train(lang):
 
     # Initialize settings
     settings = Settings(
-        name="pos_test",
-        save_path="saved_models/test",
+        name=f"{lang}",
+        save_path=f"saved_models/",
         loss="crf",
-        device=torch.device("mps"),
-        report_progress_every=100,
-        epochs=1,
-        tau=1
+        device=torch.device("cuda"),
+        report_progress_every=1000,
+        epochs=5,
+        batch_size=256,
+        lr=1e-3,
+        embedding_size=64,
+        hidden_size=128,
+        tau=1,
     )
 
     # Create and train model
@@ -59,13 +62,16 @@ def train(lang):
         prediction = predictions[i]
         target_seq = prediction.prediction
         source_seq = [prediction.alignment[i].symbol for i in range(len(prediction.alignment))]
-        reconstructed = rules2sent_strict(source_seq, target_seq)
+        reconstructed_prediction = rules2sent_strict(source_seq, target_seq)
         print("Source: ", "".join(source_seq))
-        print("Target: ", "".join([rules2sent_strict(source_seq, targets_test[predictions.index(prediction)])]))
+        print("Predicted Target: ", "".join(reconstructed_prediction))
+        print("Ground Truth: ", "".join([rules2sent_strict(source_seq, ground_truth)]))
+        print(f"Target Seq: {target_seq}")
+        print(f"Ground Truth: {ground_truth}")
         if target_seq == ground_truth:
             num_correct += 1
     print(f"Accuracy: {num_correct}/{len(predictions)} = {num_correct / len(predictions):.2%}")
 
 
 if __name__ == "__main__":
-    train("ces")
+    train("eng")

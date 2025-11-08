@@ -198,6 +198,10 @@ def run_oracle(lang, split):
     print("=" * 80)
 
     df = pd.DataFrame({'source': sources, 'actions': targets})
+    # if split == "train":
+    #     df = df[:50000]
+    # if split == "test":
+    #     df = df[:10000]
     if not os.path.exists(f'data/processed_data/{lang}'):
         os.makedirs(f'data/processed_data/{lang}')
     df.to_csv(f'data/processed_data/{lang}/{split}.csv', index=False)
