@@ -3,14 +3,15 @@
   let output = $state("")
 
   function segment(text) {
-    return text.split("");
+    return text.split(" ").map((word)=>word.split(""));
   }
 
 </script>
 
+<div id=cutting-board>
 <input value={input} style="background: red"/>
-<br>
-<button onclick={()=>{output = segment(input)}}>
+</div>
+<button onclick={()=>{output = segment(input); console.log(segment(input))}}>
   #mybutton
 </button>
 <br>
