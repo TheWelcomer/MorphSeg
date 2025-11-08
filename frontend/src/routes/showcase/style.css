@@ -1,0 +1,13 @@
+@font-face {
+    font-family: nokia;
+    src: url("/assets/nokia_cellphone/nokiafc22.ttf");
+}
+* {
+    font-family: nokia;
+}
+#cutting-board {
+    background-color: #7f6453;
+    height: 80%;
+    width: 80%;
+    margin: auto;
+}
