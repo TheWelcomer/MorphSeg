@@ -1,0 +1,42 @@
+name: Tu_Seg
+
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Core Python and CUDA
+  - python=3.12
+  - pip
+
+  # Scientific computing base
+  - numpy=2.3.4
+  - packaging=25.0
+  - typing-extensions=4.15.0
+  - requests=2.32.5
+  - certifi=2025.10.5
+
+  # Pip dependencies - Core only
+  - pip:
+    # === PYTORCH ===
+    - torch==2.8.0
+    - torchvision==0.23.0
+    - torchaudio==2.8.0
+
+    # === MODEL & TOKENIZATION ===
+    - huggingface-hub==0.36.0
+    - tokenizers==0.22.1
+    - safetensors==0.6.2
+    - datasets==4.3.0
+    - sentencepiece==0.2.1
+
+    # === TRAINING TRACKING ===
+    - wandb==0.22.3
+
+    # === UTILITIES (let pip resolve versions) ===
+    - tqdm==4.67.1
+    - edit_distance==1.0.7
+    - rich==14.2.0
+    - editdistance==0.8.1
