@@ -13,3 +13,7 @@
 <div id=cutting-board>
 <input value={input} />
 </div>
+
+<style>
+  @import "./style.css";
+</style>
