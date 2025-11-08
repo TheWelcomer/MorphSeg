@@ -8,7 +8,7 @@ import ast
 from oracle import rules2sent_strict, run_oracle
 import os
 import re
-from segmenter import Segmenter
+from morpheme_segmenter import MorphemeSegmenter
 
 os.putenv("KMP_DUPLICATE_LIB_OK", "TRUE")
 
@@ -77,8 +77,9 @@ def train(lang):
 
 
 if __name__ == "__main__":
-    segmenter = Segmenter(lang="eng")
-    input_text = "The unbelievably disagreeable preprocessor unsuccessfully reprocessed the unquestionably irreversible decontextualization"
-    segmented_text = segmenter.segment(input_text, output_string=True, delimiter=" @@")
-    print("Original Text: ", input_text)
-    print("Segmented Text: ", segmented_text)
+    train(lang="ces")
+    # segmenter = MorphemeSegmenter(lang="eng")
+    # input_text = "The unbelievably disagreeable preprocessor unsuccessfully reprocessed the unquestionably irreversible decontextualization"
+    # segmented_text = segmenter.segment(input_text, output_string=True, delimiter=" @@")
+    # print("Original Text: ", input_text)
+    # print("Segmented Text: ", segmented_text)
