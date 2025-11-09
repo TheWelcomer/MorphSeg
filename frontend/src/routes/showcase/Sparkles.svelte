@@ -16,9 +16,24 @@
         position: absolute;
         width: 10vmax;
         height: 10vmax;
+        animation: 1s linear 1 both normal zoomin;
+        animation-delay: 1.5s;
     }
-    #cooked {
-        font-size: 10em;
+    @keyframes swirl {
+        from {
+            transform: rotate(0%);
+        }
+        to {
+            transform: rotate(359%);
+        }
+    }
+    @keyframes zoomin {
+        from {
+            transform: scale(0.001);
+        }
+        to {
+            transform: scale(1);
+        }
     }
 </style>
 
@@ -26,5 +41,4 @@
     {#each numbkle as _, numb}
         <img class="sparkle" src={sparc} alt="sparkle!" style="left: {Math.random()*110-5}%; top: {Math.random()*110-5}%;">
     {/each}
-    <div id="cooked">ALL COOKED!</div>
 </div>
