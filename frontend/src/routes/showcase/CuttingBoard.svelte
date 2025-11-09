@@ -5,14 +5,15 @@
     BEFORE: 0,
     WORDS: 1,
     CLEANUP: 2,
-    MORPHEMES: 3,
+    SWAPOUT: 3,
+    MORPHEMES: 4,
   };
 
   let input = $state("What the Segma?");
   let stage = $state(Stage.BEFORE);
   let words = $state(splitWords(input));
   let morphemes = $state([["What"],["the"],["Seg","ma"]]);
-  
+
   function splitWords(text) {
     return text.replace(/\s/g, " ")
                .split(" ")
@@ -25,9 +26,27 @@
                .filter((word)=>word.length > 0);
   }
 
-  export function startAnimation(){
+  function delay(t) {
+    console.log(stage);
+    return new Promise(resolve => {
+      setTimeout(resolve, t);
+    });
+  }
+
+  async function playAnimations() {
+    stage = Stage.WORDS;
+    await delay((words.length * 250) + 250);
+    stage = Stage.CLEANUP;
+    await delay(3500);
+    stage = Stage.SWAPOUT;
+    await delay(1500);
+    stage = Stage.MORPHEMES;
+    console.log(stage);
+  }
+
+  export function startAnimation() {
     words = splitWords(input);
-    stage++;
+    playAnimations();
   }
 </script>
 
@@ -36,7 +55,7 @@
     <div id=cutting-board-input bind:innerText={input} contenteditable=true />
   {:else if stage >= Stage.WORDS}
     <div id="word-container">
-      {#if stage != Stage.MORPHEMES}
+      {#if stage <= Stage.CLEANUP}
         {#each words as word, wIndex}
           <span class="word">
               <span class="word-inner word-style-{(wIndex % 5) + 1}">
@@ -46,20 +65,30 @@
         {/each}
       {:else}
         {#each morphemes as word, wIndex}
-          {#each word as morpheme, mIndex}
+          {#if stage == Stage.MORPHEMES}
+            {#each word as morpheme, mIndex}
+              <span class="word">
+                  <span class="word-inner word-style-{(wIndex % 5) + 1}">
+                    {morpheme}
+                  </span>{#if mIndex != (word.length - 1)}
+                    <span class="morpheme-spacer"></span>
+                  {/if}
+              </span>
+            {/each}
+          {:else}
             <span class="word">
-                <span class="word-inner word-style-{(wIndex % 5) + 1}">
+              <span class="word-inner word-style-{(wIndex % 5) + 1}">
+                {#each word as morpheme}
                   {morpheme}
-                </span>{#if mIndex != (word.length - 1)}
-                  <span class="morpheme-spacer" />
-                {/if}
+                {/each}
+              </span>
             </span>
-          {/each}&nbsp<span class="canon-word-spacer" />
+          {/if}&nbsp<span class="canon-word-spacer" />
         {/each}
       {/if}
     </div>
   {/if}
-  {#if stage >= Stage.CLEANUP}
+  {#if stage >= Stage.CLEANUP && stage <= Stage.MORPHEMES}
     <Bubbles />
   {/if}
 </div>
