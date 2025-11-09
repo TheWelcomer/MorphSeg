@@ -10,6 +10,7 @@
         width: 100%;
         float: left;
         position: fixed;
+        z-index: 10;
     }
     .bubble {
         image-rendering: pixelated;
@@ -20,6 +21,7 @@
             0.22s linear infinite alternate warp;
         width: 10vmax;
         height: 10vmax;
+        z-index: 8;
     }
     .bubblig {
         image-rendering: pixelated;
@@ -30,6 +32,7 @@
             0.3s linear infinite alternate warp;
         width: 30vmax;
         height: 30vmax;
+        z-index: 6;
     }
     #sponge {
         image-rendering: pixelated;
@@ -40,6 +43,7 @@
             0.7s linear infinite alternate bob;
         width: 30vmax;
         height: 30vmax;
+        z-index: 9;
     }
     @keyframes rise {
         from {

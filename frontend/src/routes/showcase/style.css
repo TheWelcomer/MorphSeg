@@ -5,12 +5,13 @@
 
 * {
     font-family: nokia;
+    image-rendering: pixelated;
 }
 
 #cutting-board {
-    height: 75vh;
-    width: 80%;
-    margin: auto;
+    width: min(80%, 80vh * 463 / 279);
+    margin: 2.5% auto 2.5% auto;
+    aspect-ratio: calc(463 / 279);
 }
 
 #cutting-board * {
@@ -18,7 +19,7 @@
 }
 
 #cutting-board-input {
-    margin: 2em;
+    margin: 0% 18% 0% 5%;
     background-color: transparent;
     height: 100%;
     width: 100%;
