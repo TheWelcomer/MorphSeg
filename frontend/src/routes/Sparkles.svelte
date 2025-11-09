@@ -38,6 +38,6 @@
 
 <div id="sparklid">
     {#each numbkle as numbs}
-        <img class="sparkle" src="/assets/Sprite-Sparkle Hut!.gif" alt="sparkle!" style="left: {numbs[0]}%; top: {numbs[1]}%;">
+        <img class="sparkle" src="/assets/Sprite-Sparkle%20Hut!.gif" alt="sparkle!" style="left: {numbs[0]}%; top: {numbs[1]}%;">
     {/each}
 </div>

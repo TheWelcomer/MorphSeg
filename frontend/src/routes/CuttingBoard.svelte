@@ -141,7 +141,7 @@
 {/if}
 
 <style>
-  @import "./style.css";
+  @import "style.css";
 
   #submit {
     z-index: 10;

@@ -9,7 +9,7 @@
 </script>
 
 <style>
-    @import "./style.css";
+    @import "style.css";
     #starting-board {
         background-image: url("/assets/Sprite-cuttingboard.png");
         align-items: center;

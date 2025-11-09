@@ -2,8 +2,5 @@
 	"/": [
 		"src/routes/+layout.server.js",
 		"src/routes/+layout.server.js"
-	],
-	"/showcase": [
-		"src/routes/+layout.server.js"
 	]
 }

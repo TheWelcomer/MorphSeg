@@ -1,7 +1,29 @@
 <script>
-	let count = $state(0);
+  import CuttingBoard from './CuttingBoard.svelte'
+  import Start from './Start.svelte'
+
+  let cuttingBoard
 </script>
 
-<button onclick={() => count++}>
-	clicks: {count}
-</button>
+<div id=background>
+<Start />
+<CuttingBoard bind:this={cuttingBoard} />
+
+<br>
+
+
+
+</div>
+<style>
+  @import "style.css";
+  #background {
+    background: 
+      repeating-conic-gradient(#89cff0 0 25%, #FFFF 0 50%) 
+        50% / 150px 150px;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+
+</style>
