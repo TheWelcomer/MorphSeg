@@ -1,8 +1,17 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from testmorphseg import MorphemeSegmenter
 
 app = FastAPI()
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, replace with your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def root():
@@ -15,7 +24,7 @@ async def health():
 
 
 @app.get("/seg_list/{string}")
-async def seg_list():
+async def seg_list(string: str):
     morpheme_segmenter = MorphemeSegmenter(lang="eng", train_from_scratch=False)
     segments = morpheme_segmenter.segment(string, output_string=False)
     print(segments)

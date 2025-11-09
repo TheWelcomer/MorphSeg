@@ -11,10 +11,10 @@
     DONE: 5,
   };
 
-  let input = $state("What the Segma?");
+  let input = $state("Things");
+  let words = $state([]);
   let stage = $state(Stage.BEFORE);
-  let words = $state(splitWords(input));
-  let morphemes = $state([["What"],["the"],["Seg","ma"]]);
+  let morphemes = $state([]);
 
   function splitWords(text) {
     return text.replace(/\s/g, " ")
@@ -22,10 +22,15 @@
                .filter((word)=>word.length > 0);
   }
 
-  function segment(text) {
-    return text.split(" ")
-               .map((word)=>word.split(""))
-               .filter((word)=>word.length > 0);
+  async function fetchMorphemes(text) {
+    try {
+      const response = await fetch(`http://localhost:8000/seg_list/${text}`);
+      const data = await response.json();
+      morphemes = data.message;
+      console.log('Morphemes loaded:', morphemes);
+    } catch (error) {
+      console.error('Error fetching morphemes:', error);
+    }
   }
 
   function delay(t) {
@@ -46,10 +51,10 @@
     stage = Stage.DONE;
   }
 
-  export function startAnimation() {
+  export async function startAnimation() {
     if (stage > Stage.BEFORE) return;
     words = splitWords(input);
-    morphemes = segment(input);
+    await fetchMorphemes(input);
     playAnimations();
   }
 
