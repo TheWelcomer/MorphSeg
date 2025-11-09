@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from abc import ABC
 from torch import Tensor
-from ..util import make_mask_3d
+from .util import make_mask_3d
 
 
 class Attention(nn.Module, ABC):

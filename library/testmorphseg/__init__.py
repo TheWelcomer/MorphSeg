@@ -1,2 +1,2 @@
 #import spacy_pipeline
-from .non_spacy.segmenter import Segmenter
+from .non_spacy.morpheme_segmenter import MorphemeSegmenter

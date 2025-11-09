@@ -1,15 +1,21 @@
 from setuptools import find_packages,setup
 #TODO: Expose spacy module, nonspacy module (you already do this!)
+print(find_packages("."))
 setup(
     name="testmorphseg",
     version="0.0.0",
     #package_dir={"":"."},
-    packages=["testmorphseg","testmorphseg.non_spacy"], #praying you don't need 'model'
+    packages=find_packages("."),#["testmorphseg","testmorphseg.non_spacy"], #praying you don't need 'model'
     url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     description="Erm... What the Segma?",
     long_description="Long description",
     author="Timmald",
     author_email="aprilscout.dog@gmail.com",
     license="MIT",
-    install_requires=["spacy","torch","pandas","tqdm","numpy","rich","editdistance"],
+    install_requires=["spacy","torch","pandas","tqdm","numpy<2","rich","editdistance"],
+    include_package_data=True,
+    package_data={
+        "testmorphseg.non_spacy.pretrained_models": ["*.pt"],
+        "testmorphseg.non_spacy.data.raw_data.eng": ["*.tsv"],#fix this later
+    },
 )

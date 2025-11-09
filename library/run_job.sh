@@ -4,13 +4,13 @@
 #SBATCH --qos=short                      # Use 'short' QOS for higher priority (max 4h)
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16                # 8 CPUs are good for data loading and evaluation threads
-#SBATCH --mem=80G                        # Ample RAM for the 4B model and dataset
+#SBATCH --cpus-per-task=8                # 8 CPUs are good for data loading and evaluation threads
+#SBATCH --mem=24G                        # Ample RAM for the 4B model and dataset
 #SBATCH --time=03:59:00                  # Max time for 'short' QOS
 #SBATCH --output=logs/morph_seg_%j.out # Log output to a 'logs' directory
 #SBATCH --error=logs/morph_seg_%j.err  # Log errors to a 'logs' directory
 #SBATCH --gpus=1
-#SBATCH --constraint="a100"         # Optimized for modern GPUs which Unsloth/VLLM prefer
+#SBATCH --constraint="l40s|a100|2080ti"         # Optimized for modern GPUs which Unsloth/VLLM prefer
 
 
 # Job information
@@ -76,16 +76,16 @@ if [ -f "$CONDA_BASE/etc/profile.d/conda.sh" ]; then
     echo "Available environments on compute node:"
     conda env list
 
-    echo "Attempting to activate conda environment: Tu_Seg"
+    echo "Attempting to activate conda environment: MorphSeg"
 
     # Try activating by name first
-    if conda activate Tu_Seg 2>/dev/null; then
-        echo "✅ Successfully activated environment: Tu_Seg"
+    if conda activate MorphSeg 2>/dev/null; then
+        echo "✅ Successfully activated environment: MorphSeg"
     else
         echo "Name-based activation failed, trying path-based activation..."
 
         # Try activating by full path
-        CONDA_ENV_PATH="/work/pi_jaimedavila_umass_edu/dwinkelman_umass_edu/.conda/envs/Tu_Seg"
+        CONDA_ENV_PATH="/work/pi_jaimedavila_umass_edu/dwinkelman_umass_edu/.conda/envs/MorphSeg"
         if conda activate "$CONDA_ENV_PATH" 2>/dev/null; then
             echo "✅ Successfully activated environment using path: $CONDA_ENV_PATH"
         else
@@ -237,7 +237,7 @@ echo "All required environment variables are set."
 echo "==============================================="
 
 # Run the training script
-echo "Starting Tu_Seg Training..."
+echo "Starting MorphSeg Training..."
 python main.py \
 
 # Capture exit code
