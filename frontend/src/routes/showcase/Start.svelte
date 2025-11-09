@@ -38,7 +38,10 @@
         width: 6vmax;
     }
     #chefs {
-        margin: -10% 12% 0 24%;
+      padding: 17% 0 10% 0;
+      position: fixed;
+      left: 45%;
+      transform: translate(-50%, 0);
     }
     #declaration {
         text-align: center;
@@ -48,7 +51,7 @@
     }
     #instruction {
         text-align: center;
-        margin: -5% 12% 10% 0;
+        margin: 0% 12% 5% 0;
         font-size: 4vh;
         color: #322013;
         animation: 1s linear infinite normal blink;
