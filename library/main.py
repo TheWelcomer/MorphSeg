@@ -12,20 +12,21 @@ from morpheme_segmenter import MorphemeSegmenter
 os.putenv("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 if __name__ == "__main__":
-    segmenter = MorphemeSegmenter("ces", train_from_scratch=True)
+    lang = "eng"
+    segmenter = MorphemeSegmenter(lang, train_from_scratch=True)
     segmenter.train(
-        "data/raw_data/ces/train.tsv",
+        f"data/raw_data/{lang}/train.tsv",
         f"pretrained_models/",
         loss="crf",
-        device=torch.device("mps"),
+        device=torch.device("cuda"),
         report_progress_every=1000,
         epochs=5,
-        batch_size=128,
+        batch_size=256,
         lr=1e-3,
-        embedding_size=64,
-        hidden_size=128,
+        embedding_size=32,
+        hidden_size=64,
         tau=1)
-    segmenter.eval_model(test_data_filepath="data/raw_data/ces/test.tsv")
+    segmenter.eval_model(test_data_filepath=f"data/raw_data/{lang}/test.tsv")
     # input_text = "The unbelievably disagreeable preprocessor unsuccessfully reprocessed the unquestionably irreversible decontextualization"
     # segmented_text = segmenter.segment(input_text, output_string=True, delimiter=" @@")
     # print("Original Text: ", input_text)
