@@ -1,21 +1,19 @@
 <script>
-    var numbkle = new Array(20);
-    let sparc = "/assets/Sprite-Sparkle.gif";
+    var numbkle = [[15,15], [10,25], [23,17], [85,85], [90,70], [63,87], [15,85], [10,70], [23,87], [85,15], [75,13], [25,80]];
 </script>
 
 <style>
     #sparklid {
         background-color: transparent;
-        height: 100%;
-        width: 100%;
+        height: 75vh;
+        width: 80%;
         float: left;
-        position: fixed;
     }
     .sparkle {
         image-rendering: pixelated;
         position: absolute;
-        width: 10vmax;
-        height: 10vmax;
+        width: 7vmax;
+        height: 7vmax;
         animation: 1s linear 1 both normal zoomin;
         animation-delay: 1.5s;
     }
@@ -38,7 +36,7 @@
 </style>
 
 <div id="sparklid">
-    {#each numbkle as _, numb}
-        <img class="sparkle" src={sparc} alt="sparkle!" style="left: {Math.random()*110-5}%; top: {Math.random()*110-5}%;">
+    {#each numbkle as numbs}
+        <img class="sparkle" src="/assets/Sprite-Sparkle Hut!.gif" alt="sparkle!" style="left: {numbs[0]}%; top: {numbs[1]}%;">
     {/each}
 </div>
