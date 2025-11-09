@@ -77,9 +77,9 @@ class MorphemeSegmenter:
         #     self._fine_tune(data_filepath, save_path, **kwargs)
 
     def _load_data(self, data_filepath: str) -> RawDataset:
-        if data_filepath.endswith('.csv'):
+        if str(data_filepath).endswith('.csv'):
             df = pd.read_csv(data_filepath)
-        elif data_filepath.endswith('.tsv'):
+        elif str(data_filepath).endswith('.tsv'):
             df = pd.read_csv(data_filepath, sep='\t')
         else:
             raise ValueError("Data file must be a .csv or .tsv file.")
