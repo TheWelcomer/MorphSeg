@@ -22,7 +22,7 @@
         margin: none;
         z-index: 20;
         width: min(80%, 80vh * 463 / 279);
-        margin: 2.5% auto 2.5% auto;
+        margin: 2.5% 18% 5% auto;
         aspect-ratio: calc(463 / 279);
         left: 50%;
         transform: translate(-50%, 0);
@@ -32,25 +32,25 @@
         background-color: transparent;
         height: 100%;
         width: 100%;
-        float: left;
-        position: fixed;
     }
     .chef {
         image-rendering: pixelated;
-        position: absolute;
         width: 6vmax;
+    }
+    #chefs {
+        margin: -10% 12% 0 24%;
     }
     #declaration {
         text-align: center;
-        margin: auto;
+        margin: 0 12% 0 0;
         font-size: 10vh;
-        color: #b82634;
+        color: #523629;
     }
     #instruction {
         text-align: center;
-        margin: auto;
+        margin: -5% 12% 10% 0;
         font-size: 4vh;
-        color: #000000;
+        color: #322013;
         animation: 1s linear infinite normal blink;
     }
     @keyframes blink {
@@ -67,10 +67,12 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div id="starting-board" onclick={startCooking}>
-        {#each chefs as chef, order}
-            <img class="chef" src={chef[1]} alt={chef[0]} style="left:{35+order*5}vw">
-        {/each}
         <div id="declaration">MORPHOLOGICAL SEGMENTATION!</div>
+        <div id=chefs>
+            {#each chefs as chef, order}
+                <img class="chef" src={chef[1]} alt={chef[0]} style="left:{35+order*5}vw">
+            {/each}
+        </div>
         <div id="instruction">click here to start</div>
     </div>
 {/if}
