@@ -7,7 +7,7 @@
     WORDS: 1,
     CLEANUP: 2,
     SWAPOUT: 3,
-    MORPHEMES: 4,
+    ITS_MORPHEME_TIME: 4,
     DONE: 5,
   };
 
@@ -41,7 +41,7 @@
     await delay(3500);
     stage = Stage.SWAPOUT;
     await delay(1500);
-    stage = Stage.MORPHEMES;
+    stage = Stage.ITS_MORPHEME_TIME;
     await delay(2000);
     stage = Stage.DONE;
   }
@@ -67,7 +67,7 @@
         {/each}
       {:else}
         {#each morphemes as word, wIndex}
-          {#if stage == Stage.MORPHEMES}
+          {#if stage == Stage.ITS_MORPHEME_TIME}
             {#each word as morpheme, mIndex}
               <span class="word">
                   <span class="word-inner word-style-{(wIndex % 5) + 1}">
@@ -90,7 +90,7 @@
       {/if}
     </div>
   {/if}
-  {#if stage >= Stage.CLEANUP && stage <= Stage.MORPHEMES}
+  {#if stage >= Stage.CLEANUP && stage <= Stage.ITS_MORPHEME_TIME}
     <Bubbles />
   {:else if stage == Stage.DONE}
     <Sparkles />
