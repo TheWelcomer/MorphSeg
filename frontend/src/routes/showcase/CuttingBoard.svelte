@@ -97,8 +97,48 @@
   {/if}
 </div>
 
+{#if stage < Stage.ITS_MORPHEME_TIME}
+  <img id="tomato" class="veggie" src="/assets/Sprite-Tomato.gif">
+  <img id="carrot" class="veggie" src="/assets/Sprite-Carrot.gif">
+  <img id="pepper" class="veggie" src="/assets/Sprite-Pepper.gif">
+  <img id="broccoli" class="veggie" src="/assets/Sprite-Broccoli.gif">
+  <img id="onion" class="veggie" src="/assets/Sprite-Onion.gif">
+{/if}
+
 <style>
   @import "./style.css";
+
+  .veggie {
+    transform: scale(15);
+    position: absolute;
+    z-index: 1;
+  }
+
+  #tomato {
+    top: 13%;
+    left: 5%;
+  }
+
+  #carrot {
+    bottom: 20%;
+    right: 10%;
+  }
+
+  #pepper {
+    bottom: 3%;
+    left: 10%;
+  }
+
+  #broccoli {
+    bottom: 4%;
+    right: 40%;
+  }
+
+  #onion {
+    top: 13%;
+    right: 9%;
+    transform: scale(10);
+  }
   
   #cutting-board {
     align-items: center;
