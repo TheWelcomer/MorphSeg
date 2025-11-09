@@ -7,7 +7,8 @@
         background-color: transparent;
         height: 75vh;
         width: 80%;
-        float: left;
+        left: 5%;
+        position: absolute;
     }
     .sparkle {
         image-rendering: pixelated;
