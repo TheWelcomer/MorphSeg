@@ -24,7 +24,7 @@
 
   async function fetchMorphemes(text) {
     try {
-      const response = await fetch(`https://segzsy.tech/morphseg/seg_list/${text}`);
+      const response = await fetch(`https://segsy.tech/morphseg/seg_list/${text}`);
       const data = await response.json();
       morphemes = data.message;
       console.log('Morphemes loaded:', morphemes);
