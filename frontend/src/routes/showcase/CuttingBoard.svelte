@@ -14,11 +14,15 @@
   let morphemes = $state([["What"],["the"],["Seg","ma"]]);
   
   function splitWords(text) {
-    return text.replace(/\s/g, " ").split(" ");
+    return text.replace(/\s/g, " ")
+               .split(" ")
+               .filter((word)=>word.length > 0);
   }
 
   function segment(text) {
-    return text.split(" ").map((word)=>word.split(""));
+    return text.split(" ")
+               .map((word)=>word.split(""))
+               .filter((word)=>word.length > 0);
   }
 
   export function startAnimation(){
@@ -33,12 +37,12 @@
   {:else if stage >= Stage.WORDS}
     <div id="word-container">
       {#if stage != Stage.MORPHEMES}
-        {#each words as word}
+        {#each words as word, wIndex}
           <span class="word">
               <span class="word-inner">
                 {word}
               </span>
-          </span>&nbsp<span class="word-spacer" />
+          </span>&nbsp<span class="word-spacer" style="animation-delay: {wIndex * 0.25}s;" />
         {/each}
       {:else}
         {#each morphemes as word}
@@ -85,13 +89,13 @@
   }
 
   .word-spacer {
-    animation: 1s ease-out 0.2s 1 both expand;
+    animation: 0.5s ease-out 1 both expand;
     animation-iteration-count: 1;
     display: inline-block;
   }
 
   .morpheme-spacer {
-    animation: 1s ease-out 0.2s 1 both expand-less;
+    animation: 0.5s ease-out 0.2s 1 both expand-less;
     animation-iteration-count: 1;
     display: inline-block;
   }
