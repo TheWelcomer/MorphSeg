@@ -2,9 +2,10 @@ import spacy
 from spacy.language import Language
 from spacy.tokens import Doc, Token, Span
 import warnings
-
+from .non_spacy.morpheme_segmenter import MorphemeSegmenter
+seg = MorphemeSegmenter("eng")
 def predict(word:str)->list[str]:
-    return [word[:len(word)//2],word[len(word)//2:]]
+    return seg.segment(word)[0]
 
 Token.set_extension("morphemes",default=None)#do this in the global scope so it happens when imported
 Span.set_extension("morphemes",getter=lambda obj: [i._.morphemes for i in obj])#unsure if this is doing its thing
