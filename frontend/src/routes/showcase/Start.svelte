@@ -11,15 +11,22 @@
 <style>
     @import "./style.css";
     #starting-board {
+        background-image: url("/assets/Sprite-cuttingboard.png");
         align-items: center;
         justify-content: center;
         display: flex;
-        position: relative;
-        background-image: url("/assets/Sprite-cuttingboard.png");
+        position: fixed;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: left center;
         margin: none;
+        z-index: 20;
+        width: min(80%, 80vh * 463 / 279);
+        margin: 2.5% auto 2.5% auto;
+        aspect-ratio: calc(463 / 279);
+        left: 50%;
+        transform: translate(-50%, 0);
+        display: grid;
     }
     #startid {
         background-color: transparent;
@@ -32,7 +39,6 @@
         image-rendering: pixelated;
         position: absolute;
         width: 6vmax;
-        height: 6vmax;
     }
     #declaration {
         text-align: center;
