@@ -1,0 +1,35 @@
+@font-face {
+    font-family: nokia;
+    src: url("/assets/nokia_cellphone/nokiafc22.ttf");
+}
+
+* {
+    font-family: nokia;
+}
+
+#cutting-board {
+    height: 75vh;
+    width: 80%;
+    margin: auto;
+}
+
+#cutting-board * {
+    font-size: 4vh;
+}
+
+#cutting-board-input {
+    margin: 2em;
+    background-color: transparent;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+* {
+  cursor: url("/assets/Sprite-Knife_Cursor.gif"), default;
+}
+
+*:active {
+    cursor: url("/assets/Sprite-Knife_Cursorv2.png"), default;
+}
