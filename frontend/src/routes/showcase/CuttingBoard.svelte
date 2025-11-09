@@ -109,11 +109,13 @@
     background-repeat: no-repeat;
     background-size: contain;
     background-position: left center;
+    margin: none;
   }
 
   #word-container {
+    margin: 5% 18% 5% 5%;
+    align-items: center;
     width: 100%;
-    margin: 2em;  
   }
 
   .word {
