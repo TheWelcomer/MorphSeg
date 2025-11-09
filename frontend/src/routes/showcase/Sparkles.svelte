@@ -1,13 +1,13 @@
 <script>
-    var numbkle = [[15,15], [10,25], [23,17], [85,85], [90,70], [63,87], [15,85], [10,70], [23,87], [85,15], [75,13], [25,80]];
+    var numbkle = [[5,5], [7,15], [13,7], [90,90], [93,73], [77,90], [10,91], [9,76], [18,92], [90,12], [80,8], [85,20]];
 </script>
 
 <style>
     #sparklid {
         background-color: transparent;
-        height: 75vh;
-        width: 80%;
-        left: 5%;
+        height: 90vh;
+        width: 100%;
+        left: -10%;
         position: absolute;
     }
     .sparkle {
