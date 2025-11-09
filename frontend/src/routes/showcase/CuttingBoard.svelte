@@ -1,5 +1,6 @@
 <script>
   import Bubbles from "./Bubbles.svelte"
+  import Sparkles from "./Sparkles.svelte"
 
   const Stage = {
     BEFORE: 0,
@@ -7,6 +8,7 @@
     CLEANUP: 2,
     SWAPOUT: 3,
     MORPHEMES: 4,
+    DONE: 5,
   };
 
   let input = $state("What the Segma?");
@@ -27,7 +29,6 @@
   }
 
   function delay(t) {
-    console.log(stage);
     return new Promise(resolve => {
       setTimeout(resolve, t);
     });
@@ -41,7 +42,8 @@
     stage = Stage.SWAPOUT;
     await delay(1500);
     stage = Stage.MORPHEMES;
-    console.log(stage);
+    await delay(2000);
+    stage = Stage.DONE;
   }
 
   export function startAnimation() {
@@ -61,7 +63,7 @@
               <span class="word-inner word-style-{(wIndex % 5) + 1}">
                 {word}
               </span>
-          </span>&nbsp<span class="word-spacer" style="animation-delay: {wIndex * 0.25}s;" />
+          </span>&nbsp<span class="word-spacer" style="animation-delay: {wIndex * 0.25}s;"></span>
         {/each}
       {:else}
         {#each morphemes as word, wIndex}
@@ -83,13 +85,15 @@
                 {/each}
               </span>
             </span>
-          {/if}&nbsp<span class="canon-word-spacer" />
+          {/if}&nbsp<span class="canon-word-spacer"></span>
         {/each}
       {/if}
     </div>
   {/if}
   {#if stage >= Stage.CLEANUP && stage <= Stage.MORPHEMES}
     <Bubbles />
+  {:else if stage == Stage.DONE}
+    <Sparkles />
   {/if}
 </div>
 
