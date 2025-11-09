@@ -4,14 +4,29 @@
   let cuttingBoard
 </script>
 
+<div id=background>
 <CuttingBoard bind:this={cuttingBoard} />
 
 <br>
 
-<button onclick={()=>{cuttingBoard.startAnimation()}}>
+<button id=submit onclick={()=>{cuttingBoard.startAnimation()}}>
   #mybutton
 </button>
 
+</div>
 <style>
   @import "./style.css";
+  #background {
+    background: 
+      repeating-conic-gradient(#89cff0 0 25%, #FFFF 0 50%) 
+        50% / 150px 150px;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  #submit {
+    z-index: 10;
+    position: fixed;
+  }
 </style>

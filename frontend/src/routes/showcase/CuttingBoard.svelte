@@ -103,6 +103,12 @@
   <img id="pepper" class="veggie" src="/assets/Sprite-Pepper.gif">
   <img id="broccoli" class="veggie" src="/assets/Sprite-Broccoli.gif">
   <img id="onion" class="veggie" src="/assets/Sprite-Onion.gif">
+{:else}
+  <img id="tomato" class="veggie" src="/assets/Sprite-Cut_Tomato.gif">
+  <img id="carrot" class="veggie" src="/assets/Sprite-Cut_Carrot.gif">
+  <img id="pepper" class="veggie" src="/assets/Sprite-Cut_Pepper.gif">
+  <img id="broccoli" class="veggie" src="/assets/Sprite-Cut_Broccoli.gif">
+  <img id="onion" class="veggie" src="/assets/Sprite-Cut_Onion.gif">
 {/if}
 
 <style>
@@ -110,7 +116,7 @@
 
   .veggie {
     transform: scale(15);
-    position: absolute;
+    position: fixed;
     z-index: 1;
   }
 
@@ -125,7 +131,7 @@
   }
 
   #pepper {
-    bottom: 3%;
+    bottom: 13%;
     left: 10%;
   }
 
@@ -137,7 +143,7 @@
   #onion {
     top: 13%;
     right: 9%;
-    transform: scale(10);
+    transform: scale(12);
   }
   
   #cutting-board {
