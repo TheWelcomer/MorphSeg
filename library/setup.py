@@ -12,9 +12,10 @@ setup(
     author="Timmald",
     author_email="aprilscout.dog@gmail.com",
     license="MIT",
-    install_requires=["spacy","torch","pandas","tqdm","numpy","rich","editdistance"],
+    install_requires=["spacy","torch","pandas","tqdm","numpy<2","rich","editdistance"],
     include_package_data=True,
     package_data={
         "testmorphseg.non_spacy.pretrained_models": ["*.pt"],
+        "testmorphseg.non_spacy.data.raw_data.eng": ["*.tsv"],#fix this later
     },
 )
