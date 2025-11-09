@@ -32,6 +32,7 @@
 </script>
 
 <div id=cutting-board>
+  <img id=cutting-board-img src="/assets/Sprite-cuttingboard.png" />
   {#if stage == Stage.BEFORE}
     <div id=cutting-board-input bind:innerText={input} contenteditable=true />
   {:else if stage >= Stage.WORDS}
@@ -71,6 +72,16 @@
     align-items: center;
     justify-content: center;
     display: flex;
+    position: relative;
+  }
+
+  #cutting-board-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -5;
   }
 
   #word-container {
