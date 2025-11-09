@@ -371,5 +371,5 @@ def train(train_data: RawDataset, development_data: Optional[RawDataset], settin
         if model_improved or epoch == 1:
             best_checkpoint_path = checkpoint_path
 
-    model = load_model(best_checkpoint_path)
+    model = load_model(best_checkpoint_path, settings.device)
     return model
