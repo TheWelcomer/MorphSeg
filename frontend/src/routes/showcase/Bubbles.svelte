@@ -29,6 +29,16 @@
         width: 30vmax;
         height: 30vmax;
     }
+    #sponge {
+        image-rendering: pixelated;
+        position: absolute;
+        left: -50vw;
+        top: 20vh;
+        animation: 6s linear 1 both normal slide,
+            0.7s linear infinite alternate bob;
+        width: 30vmax;
+        height: 30vmax;
+    }
     @keyframes rise {
         from {
             top: 150vh;
@@ -45,6 +55,22 @@
             transform: translate(10%);
         }
     }
+    @keyframes slide {
+        from {
+            left: -50vw;
+        }
+        to {
+            left: 150vmax;
+        }
+    }
+    @keyframes bob {
+        from {
+            transform: translate(0%);
+        }
+        to {
+            transform: translate(0%, 20%);
+        }
+    }
 </style>
 
 <div id="bubblid">
@@ -58,4 +84,5 @@
         <img class="bubble" src="/assets/Sprite-Bubble2.gif" alt="bubble!" style="transform: scale({Math.random()*2+0.5}); left: {Math.random()*110-5}%; animation-delay:{numb*.04}s,{Math.random()}s">
         <img class="bubble" src="/assets/Sprite-Bubble3.gif" alt="bubble!" style="transform: scale({Math.random()*2+0.5}); left: {Math.random()*110-5}%; animation-delay:{numb*.04}s,{Math.random()}s">
     {/each}
+    <img id="sponge" src="/assets/Sprite-Sponge.gif" alt="sponge!">
 </div>
