@@ -50,6 +50,10 @@
     words = splitWords(input);
     playAnimations();
   }
+
+  export function stopAnimation() {
+    stage = Stage.BEFORE;
+  }
 </script>
 
 <div id=cutting-board>
@@ -115,35 +119,37 @@
   @import "./style.css";
 
   .veggie {
-    transform: scale(15);
-    position: fixed;
+    width: 50vh;
+    height: 50vh;
+    position: absolute;
     z-index: 1;
   }
 
   #tomato {
-    top: 13%;
-    left: 5%;
+    top: -10%;
+    left: -6%;
   }
 
   #carrot {
-    bottom: 20%;
-    right: 10%;
+    bottom: 0%;
+    right: 0%;
   }
 
   #pepper {
-    bottom: 13%;
-    left: 10%;
+    bottom: -7%;
+    left: -7%;
   }
 
   #broccoli {
-    bottom: 4%;
-    right: 40%;
+    bottom: -14%;
+    right: 30%;
   }
 
   #onion {
-    top: 13%;
-    right: 9%;
-    transform: scale(12);
+    width: 35vh;
+    height: 35vh;
+    top: 0%;
+    right: 0%;
   }
   
   #cutting-board {
