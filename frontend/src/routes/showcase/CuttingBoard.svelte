@@ -49,6 +49,7 @@
   export function startAnimation() {
     if (stage > Stage.BEFORE) return;
     words = splitWords(input);
+    morphemes = segment(input);
     playAnimations();
   }
 
