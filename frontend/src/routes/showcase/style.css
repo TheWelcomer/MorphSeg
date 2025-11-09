@@ -27,21 +27,6 @@
     align-items: center;
 }
 
-#submit {
-    padding: 1vh;
-    border-radius: 0.3em;
-    border-style: solid;
-    border-width: 0.15em;
-    border-color: #ecb669;
-    background-color: #523629;
-    color: #ffffff;
-    font-size: 4vh;
-    position: absolute;
-    left: 25%;
-    transform: translate(-50%, 0%);
-    bottom: 2%;
-}
-
 * {
   cursor: url("/assets/Sprite-Knife_Cursor.gif"), default;
 }

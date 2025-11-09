@@ -47,12 +47,17 @@
   }
 
   export function startAnimation() {
+    if (stage > Stage.BEFORE) return;
     words = splitWords(input);
     playAnimations();
   }
 
-  export function stopAnimation() {
+  export function resetAnimation() {
     stage = Stage.BEFORE;
+  }
+
+  export function isStarted() {
+    return stage != Stage.BEFORE;
   }
 </script>
 
@@ -101,6 +106,20 @@
   {/if}
 </div>
 
+{#if stage == Stage.BEFORE}
+  <button id=submit onclick={()=>{startAnimation()}}>
+    SEGMENT!
+  </button>
+{:else if stage < Stage.DONE}
+  <button id=submit class="disabled" onclick={()=>{startAnimation()}}>
+    SEGMENT!
+  </button>
+{:else}
+  <button id=submit onclick={()=>{resetAnimation()}}>
+    RESET!
+  </button>
+{/if}
+
 {#if stage < Stage.ITS_MORPHEME_TIME}
   <img id="tomato" class="veggie" src="/assets/Sprite-Tomato.gif">
   <img id="carrot" class="veggie" src="/assets/Sprite-Carrot.gif">
@@ -117,6 +136,27 @@
 
 <style>
   @import "./style.css";
+
+  #submit {
+    z-index: 10;
+    position: fixed;
+    padding: 1vh;
+    border-radius: 0.3em;
+    border-style: solid;
+    border-width: 0.15em;
+    border-color: #ecb669;
+    background-color: #523629;
+    color: #ffffff;
+    font-size: 4vh;
+    position: absolute;
+    left: 25%;
+    transform: translate(-50%, 0%);
+    bottom: 2%;
+  }
+
+  #submit.disabled {
+    color: #AAAAAA;
+  }
 
   .veggie {
     width: 50vh;

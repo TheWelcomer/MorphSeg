@@ -11,9 +11,7 @@
 
 <br>
 
-<button id=submit onclick={()=>{cuttingBoard.startAnimation()}}>
-  SEGMENT!
-</button>
+
 
 </div>
 <style>
@@ -27,8 +25,5 @@
     height: 100%;
   }
 
-  #submit {
-    z-index: 10;
-    position: fixed;
-  }
+
 </style>
