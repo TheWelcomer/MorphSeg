@@ -67,7 +67,7 @@
         {/each}
       {:else}
         {#each morphemes as word, wIndex}
-          {#if stage == Stage.ITS_MORPHEME_TIME}
+          {#if stage >= Stage.ITS_MORPHEME_TIME}
             {#each word as morpheme, mIndex}
               <span class="word">
                   <span class="word-inner word-style-{(wIndex % 5) + 1}">
