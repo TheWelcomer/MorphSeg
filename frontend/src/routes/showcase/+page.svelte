@@ -1,10 +1,12 @@
 <script>
   import CuttingBoard from './CuttingBoard.svelte'
+  import Start from './Start.svelte'
 
   let cuttingBoard
 </script>
 
 <div id=background>
+<Start />
 <CuttingBoard bind:this={cuttingBoard} />
 
 <br>
