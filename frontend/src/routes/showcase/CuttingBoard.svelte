@@ -39,16 +39,16 @@
       {#if stage != Stage.MORPHEMES}
         {#each words as word, wIndex}
           <span class="word">
-              <span class="word-inner">
+              <span class="word-inner word-style-{(wIndex % 5) + 1}">
                 {word}
               </span>
           </span>&nbsp<span class="word-spacer" style="animation-delay: {wIndex * 0.25}s;" />
         {/each}
       {:else}
-        {#each morphemes as word}
+        {#each morphemes as word, wIndex}
           {#each word as morpheme, mIndex}
             <span class="word">
-                <span class="word-inner">
+                <span class="word-inner word-style-{(wIndex % 5) + 1}">
                   {morpheme}
                 </span>{#if mIndex != (word.length - 1)}
                   <span class="morpheme-spacer" />
@@ -84,8 +84,35 @@
   }
 
   .word-inner {
-    background-color: blue;
     padding: 0.1em;
+    border-radius: 0.3em;
+    border-style: solid;
+    border-width: 0.15em;
+  }
+
+  .word-style-1 {
+    background-color: #b82634;
+    border-color: #961743;
+  }
+
+  .word-style-2 {
+    background-color: #d3802e;
+    border-color: #c16a38;
+  }
+
+  .word-style-3 {
+    background-color: #d0a94e;
+    border-color: #d78d43;
+  }
+
+  .word-style-4 {
+    background-color: #489d3e;
+    border-color: #407b51;
+  }
+
+  .word-style-5 {
+    background-color: #8a4896;
+    border-color: #663479;
   }
 
   .word-spacer {
