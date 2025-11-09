@@ -17,7 +17,7 @@ if __name__ == "__main__":
         "data/raw_data/ces/train.tsv",
         f"pretrained_models/",
         loss="crf",
-        device=torch.device("cuda"),
+        device=torch.device("mps"),
         report_progress_every=1000,
         epochs=5,
         batch_size=128,
