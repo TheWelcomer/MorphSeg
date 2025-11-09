@@ -4,7 +4,7 @@
         {
           "src": "main.py",
           "use": "@vercel/python",
-          "config": { "maxLambdaSize": "500mb" }
+          "config": { "maxLambdaSize": "2000mb" }
         }
     ],
     "routes": [
