@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
-from ..util import make_mask_2d
+from .util import make_mask_2d
 from .lstm import BiLSTMEncoder
 from .attention import MLPAttention
 from .attention import DotProductAttention

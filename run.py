@@ -1,5 +1,5 @@
 from testmorphseg import spacy_pipeline
-from testmorphseg import Segmenter
+from testmorphseg import MorphemeSegmenter
 import spacy
 
 cls = spacy.util.get_lang_class("en")
@@ -9,7 +9,7 @@ result = nlp("I WANNA BE SEGGED SO BAD")
 print([token._.morphemes for token in result])
 print(result._.morphemes)
 
-seg = Segmenter("eng")
+seg = MorphemeSegmenter("eng")
 
 seggs = seg.segment("I WANNA BE SEGGED SO BAD")
 print(seggs)
