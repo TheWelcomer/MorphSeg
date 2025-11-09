@@ -12,7 +12,7 @@
 <br>
 
 <button id=submit onclick={()=>{cuttingBoard.startAnimation()}}>
-  #mybutton
+  SEGMENT!
 </button>
 
 </div>
