@@ -1,7 +1,10 @@
 <script>
+  import Bubbles from "./Bubbles.svelte"
+
   const Stage = {
     BEFORE: 0,
     WORDS: 1,
+    CLEANUP: 2,
   };
 
   let input = $state("What the Segma?");
@@ -18,16 +21,14 @@
 
   export function startAnimation(){
     words = splitWords(input);
-    console.log(input);
-    console.log(words);
-    stage = Stage.WORDS;
+    stage++;
   }
 </script>
 
 <div id=cutting-board>
   {#if stage == Stage.BEFORE}
     <div id=cutting-board-input bind:innerText={input} contenteditable=true />
-  {:else if stage == Stage.WORDS}
+  {:else if stage >= Stage.WORDS}
     <div id="word-container">
       {#each words as word}
         <span class="word">
@@ -37,6 +38,9 @@
         </span>&nbsp<span class="word-spacer" />
       {/each}
     </div>
+  {/if}
+  {#if stage == Stage.CLEANUP}
+    <Bubbles />
   {/if}
 </div>
 
@@ -67,7 +71,6 @@
   .word-spacer {
     animation: 1s ease-out 0.2s 1 both expand;
     animation-iteration-count: 1;
-    background-color: red;
     display: inline-block;
   }
 
