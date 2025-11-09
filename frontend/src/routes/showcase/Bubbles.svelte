@@ -16,7 +16,8 @@
         position: absolute;
         top: 150vh;
         animation: 3s linear 1 both normal rise,
-            0.5s linear infinite alternate sway;
+            0.5s linear infinite alternate sway,
+            0.22s linear infinite alternate warp;
         width: 10vmax;
         height: 10vmax;
     }
@@ -25,7 +26,8 @@
         position: absolute;
         top: 150vh;
         animation: 2.5s linear 1 both normal rise,
-            0.5s linear infinite alternate sway;
+            0.5s linear infinite alternate sway,
+            0.3s linear infinite alternate warp;
         width: 30vmax;
         height: 30vmax;
     }
@@ -55,6 +57,14 @@
             transform: translate(10%);
         }
     }
+    @keyframes warp {
+        from {
+            transform: skew(20deg, -10deg);
+        }
+        to {
+            transform: skew(-10deg, -20deg);
+        }
+    }
     @keyframes slide {
         from {
             left: -50vw;
@@ -65,10 +75,10 @@
     }
     @keyframes bob {
         from {
-            transform: translate(0%);
+            transform: translate(0%) skew(25deg, -10deg);
         }
         to {
-            transform: translate(0%, 20%);
+            transform: translate(0%, 20%) skew(-10deg, -20deg);
         }
     }
 </style>
