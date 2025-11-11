@@ -44,7 +44,7 @@ We solve this problem by making use of a BiLSTM-CRF model architecture named Tü
 ## Example
 Given the input word "unhappiness", the model might output the following BIO tags:
 - u: [COPY]
-- n: [COPY]
+- n: [COPY, SEP]
 - h: [COPY]
 - a: [COPY]
 - p: [COPY]
