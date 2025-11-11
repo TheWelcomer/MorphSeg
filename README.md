@@ -53,7 +53,7 @@ Given the input word "unhappiness", the model might output the following BIO tag
 - n: [COPY]
 - e: [COPY]
 - s: [COPY]
-- s: [COPY]
+- s: [COPY]<br>
 Using these tags, we can reconstruct the segmented output as "un @@ happy @@ ness".
 
 # Features
