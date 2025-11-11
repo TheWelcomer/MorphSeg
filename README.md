@@ -54,6 +54,7 @@ Given the input word "unhappiness", the model might output the following BIO tag
 - e: [COPY]
 - s: [COPY]
 - s: [COPY]
+Using these tags, we can reconstruct the segmented output as "un @@ happy @@ ness".
 
 # Features
 The MorphSeg library provides the following features:
