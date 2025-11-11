@@ -39,11 +39,11 @@ We solve this problem by making use of a BiLSTM-CRF model architecture named Tü
 - COPY: Copy the character to the output.
 - SEP: Append a morpheme separator (e.g., " @@") to the output after the character.
 - DELETE: Do not copy the character to the output.
-- (ADD_<char>): Add the character <char> to the output.
+- (ADD_`<char>`): Add the character `<char>` to the output.
 
 ## Example
 Given the input word "unhappiness", the model might output the following BIO tags:
-- u: [COPY
+- u: [COPY]
 - n: [COPY]
 - h: [COPY]
 - a: [COPY]
