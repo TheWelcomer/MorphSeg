@@ -21,6 +21,8 @@ dependencies = [
     "numpy<2",
     "rich",
     "editdistance",
+    "safetensors",
+    "huggingface-hub",
 ]
 
 [project.optional-dependencies]

@@ -56,7 +56,7 @@ class LSTMModel(nn.Module):
         return {
             'vocab_size': self.vocab_size,
             'num_labels': self.num_labels,
-            'device': self.device,
+            'device': str(self.device),
             'embedding_size': self.embedding_size,
             'hidden_size': self.hidden_size,
             'num_layers': self.num_layers,

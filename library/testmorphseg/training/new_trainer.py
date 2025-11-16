@@ -1,10 +1,12 @@
+# testmorphseg/training/trainer.py
+
 import os
 import torch
 import numpy as np
 import torch.nn as nn
 import json
-
 from safetensors.torch import save_file, load_file
+
 from typing import List
 from typing import Tuple
 from testmorphseg.utils.logger import logger
@@ -103,12 +105,10 @@ def _build_scheduler(optimizer: Optimizer, scheduler: str, gamma: float, lr: flo
     if scheduler == "exponential":
         scheduler_instance = ExponentialLR(optimizer=optimizer, gamma=gamma)
     elif scheduler == "one-cycle":
-        scheduler_instance = OneCycleLR(optimizer=optimizer, max_lr=lr, total_steps=total_steps, pct_start=0.1)
+        scheduler_instance = OneCycleLR(optimizer=optimizer, max_lr=lr, total_steps=total_steps)
     else:
         raise ValueError(f"Unknown scheduler: {scheduler}")
 
-    # Define step function that calls step on epoch end for exponential scheduler,
-    # and on update for one-cycle-scheduler
     def scheduler_step(epoch_end: bool):
         if scheduler == "exponential" and epoch_end:
             scheduler_instance.step()
@@ -208,14 +208,11 @@ def evaluate_on_development_data(model: TrainedModel, development_data: Sequence
     get_loss, inference = _get_loss_function(loss=loss)
     target_vocabulary = model.target_vocabulary
 
-    # Build dataloader
     development_dataloader = DataLoader(
         development_data, batch_size=batch_size, shuffle=False, collate_fn=development_data.collate_fn
     )
 
-    losses = []
-    predictions = []
-    targets = []
+    losses, predictions, targets = [], [], []
 
     with torch.no_grad():
         for batch in development_dataloader:
@@ -226,175 +223,93 @@ def evaluate_on_development_data(model: TrainedModel, development_data: Sequence
                 model=model.model.eval(), logits=batch_model_output.logits, lengths=batch.source_lengths,
                 target_vocabulary=target_vocabulary, tau=model.model.tau, sources=batch.raw_sources
             )
-            batch_predictions = [prediction.prediction for prediction in batch_predictions]
-            predictions.extend(batch_predictions)
+            predictions.extend([p.prediction for p in batch_predictions])
             targets.extend(batch.raw_targets)
 
-    metrics = get_metrics(predictions=predictions, targets=targets, losses=losses)
-    return metrics
+    return get_metrics(predictions=predictions, targets=targets, losses=losses)
 
 
 def train(train_data: RawDataset, development_data: Optional[RawDataset], settings: Settings) -> TrainedModel:
     if settings.verbose:
         logger.info("Prepare for Training")
-        logger.info("Build vocabulary and datasets")
-
-    # Build and unpack dataset info
     dataset_collection = _prepare_datasets(
         train_data=train_data, development_data=development_data, use_features=settings.use_features
     )
-    train_dataset = dataset_collection.train_dataset
-    dev_dataset = dataset_collection.development_dataset
-    source_vocabulary = dataset_collection.source_vocabulary
-    target_vocabulary = dataset_collection.target_vocabulary
-    feature_vocabulary = dataset_collection.feature_vocabulary
+    train_dataset, dev_dataset = dataset_collection.train_dataset, dataset_collection.development_dataset
+    source_vocabulary, target_vocabulary, feature_vocabulary = (
+        dataset_collection.source_vocabulary, dataset_collection.target_vocabulary,
+        dataset_collection.feature_vocabulary
+    )
 
-    if settings.verbose:
-        logger.info(f"Train data contains {len(train_dataset)} datapoints")
-        if dev_dataset is not None:
-            logger.info(f"Dev data contains {len(dev_dataset)} datapoints")
-        logger.info(f"Source vocabulary contains {len(source_vocabulary)} items")
-        logger.info(f"Target vocabulary contains {len(target_vocabulary)} actions")
-
-    # Build training dataloader
     train_dataloader = DataLoader(
         train_dataset, batch_size=settings.batch_size, shuffle=True, collate_fn=train_dataset.collate_fn
     )
     total_steps = settings.epochs * len(train_dataloader)
 
-    # Build model
-    if settings.verbose:
-        logger.info("Build model")
-
     model = _build_model(
         source_vocab_size=len(source_vocabulary), target_vocab_size=len(target_vocabulary), settings=settings
     )
-    print(model)
+    model.to(device=settings.device).train()
 
-    if settings.verbose:
-        num_model_parameters = _count_model_parameters(model)
-        logger.info(f"Model has {num_model_parameters} parameters")
-        logger.info(f"Device: {settings.device}")
-    model = model.to(device=settings.device)
-    model = model.train()
-
-    # Build optimizer
-    if settings.verbose:
-        logger.info("Build optimizer")
     optimizer = _build_optimizer(
         model=model, optimizer=settings.optimizer, lr=settings.lr, weight_decay=settings.weight_decay
     )
-
-    # Build scheduler
-    if settings.verbose:
-        logger.info("Build scheduler")
-
     scheduler_step = _build_scheduler(
         optimizer, scheduler=settings.scheduler, gamma=settings.gamma, lr=settings.lr, total_steps=total_steps
     )
-
-    # Get loss function
     get_loss, _ = _get_loss_function(loss=settings.loss)
 
     if settings.verbose:
         logger.info("Start Training")
 
-    running_loss = None
-    step_counter = 0
-    best_model_metric = np.inf
+    running_loss, step_counter, best_model_metric = None, 0, np.inf
     best_checkpoint_path = None
 
     for epoch in range(1, settings.epochs + 1):
-        # Train epoch
-        model = model.train()
+        model.train()
         epoch_losses = []
-
         for batch in train_dataloader:
             optimizer.zero_grad()
             loss = get_loss(model=model, batch=batch, reduction="mean").loss
-
-            # Update parameters
             loss.backward()
-            if settings.grad_clip is not None:
+            if settings.grad_clip:
                 clip_grad_value_(model.parameters(), settings.grad_clip)
             optimizer.step()
             scheduler_step(False)
 
-            # Display loss
             step_counter += 1
             loss_item = loss.detach().cpu().item()
             running_loss = moving_avg_loss(running_loss, loss_item)
             epoch_losses.append(loss_item)
 
-            if settings.verbose:
-                if step_counter % settings.report_progress_every == 0 or step_counter == 1:
-                    progress = 100 * step_counter / total_steps
-                    current_learning_rate = optimizer.param_groups[0]['lr']
-                    logger.info(
-                        f"[{progress:.2f}%]" +
-                        f" Loss: {running_loss:.3f}" +
-                        f" || LR: {current_learning_rate:.6f}" +
-                        f" || Step {step_counter} / {total_steps}"
-                    )
-
-        # Evaluate on dev set
-        epoch_model = TrainedModel(
-            model=model, source_vocabulary=source_vocabulary, target_vocabulary=target_vocabulary,
-            feature_vocabulary=feature_vocabulary, metrics=None, checkpoint=None, settings=settings
-        )
-
-        if dev_dataset is not None:
-            development_metrics = evaluate_on_development_data(
-                model=epoch_model, development_data=dev_dataset, batch_size=settings.batch_size, loss=settings.loss
-            )
-
-            if settings.verbose:
+            if settings.verbose and (step_counter % settings.report_progress_every == 0 or step_counter == 1):
+                progress = 100 * step_counter / total_steps
+                lr = optimizer.param_groups[0]['lr']
                 logger.info(
-                    f"[Development metrics]    " +
-                    f"Loss: {development_metrics.loss:.4f}" +
-                    f" || WER: {development_metrics.wer:.2f}" +
-                    f" || Edit-Distance: {development_metrics.edit_distance:.2f}"
-                )
+                    f"[{progress:.2f}%] Loss: {running_loss:.3f} || LR: {lr:.6f} || Step {step_counter}/{total_steps}")
 
-        else:
-            development_metrics = None
+        epoch_model = TrainedModel(model, source_vocabulary, target_vocabulary, feature_vocabulary, None, None,
+                                   settings)
+        development_metrics = None
+        if dev_dataset:
+            development_metrics = evaluate_on_development_data(epoch_model, dev_dataset, settings.batch_size,
+                                                               settings.loss)
+            if settings.verbose:
+                logger.info(f"[Dev metrics] Loss: {development_metrics.loss:.4f} || WER: {development_metrics.wer:.2f}")
 
         scheduler_step(True)
-
-        if development_metrics is not None:
-            epoch_model_metric = development_metrics[metric_names.index(settings.main_metric)]
-        else:
-            epoch_model_metric = np.mean(epoch_losses)
-
+        epoch_model_metric = development_metrics[
+            metric_names.index(settings.main_metric)] if development_metrics else np.mean(epoch_losses)
         model_improved = epoch_model_metric < best_model_metric
-        best_model_metric = epoch_model_metric if model_improved else best_model_metric
 
-        if development_metrics is not None:
-            save_metrics = development_metrics
-        else:
-            save_metrics = Metrics(
-                loss=np.mean(epoch_losses), wer=None, ter=None, edit_distance=None, normalised_edit_distance=None
-            )
-
-        epoch_model = TrainedModel(
-            model=model, source_vocabulary=source_vocabulary, target_vocabulary=target_vocabulary,
-            feature_vocabulary=feature_vocabulary, metrics=save_metrics, checkpoint=epoch, settings=settings
-        )
-
-        if settings.keep_only_best_checkpoint:
-            if model_improved or epoch == 1:
-                if settings.verbose:
-                    logger.info(f"Saving Model after epoch {epoch}")
-                checkpoint_path = save_model(model=epoch_model, name=settings.name, path=settings.save_path)
-            else:
-                checkpoint_path = best_checkpoint_path
-        else:
+        if model_improved:
+            best_model_metric = epoch_model_metric
             if settings.verbose:
-                logger.info(f"Saving Model after epoch {epoch}")
-            checkpoint_path = save_model(model=epoch_model, name=settings.name + f"_{epoch}", path=settings.save_path)
-
-        if model_improved or epoch == 1:
+                logger.info(f"Saving best model after epoch {epoch}")
+            checkpoint_path = save_model(epoch_model, settings.name, settings.save_path)
             best_checkpoint_path = checkpoint_path
 
-    model = load_model(best_checkpoint_path, settings.device)
-    return model
+    if not best_checkpoint_path:
+        best_checkpoint_path = save_model(epoch_model, settings.name, settings.save_path)
+
+    return load_model(best_checkpoint_path, settings.device)

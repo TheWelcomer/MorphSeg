@@ -1,47 +1,66 @@
 import torch
 import re
-from testmorphseg.training.sequence_labeller import SequenceLabeller
+import os
+import pandas as pd
+
+from importlib import resources
+from huggingface_hub import HfApi, hf_hub_download, upload_file
+from testmorphseg.interface.sequence_labeller import SequenceLabeller
 from testmorphseg.training.oracle import sent2rules, rules2sent
 from testmorphseg.utils.settings import Settings
 from testmorphseg.training.dataset import RawDataset
-import os
-import pandas as pd
-from importlib import resources
+
 
 class MorphemeSegmenter:
-    def __init__(self, lang, model_path=None, train_from_scratch=False):
+    PRETRAINED_REPO_PREFIX = 'MorphSeg'
+    PRETRAINED_MODEL_LANGS = []
+
+    def __init__(self, lang, train_from_scratch=False, model_path=None, is_local=True):
         self.lang = lang
         self.train_from_scratch = train_from_scratch
-        if type(lang) is not str:
-            raise ValueError("Language must be a string.")
-        if type(train_from_scratch) is not bool:
-            raise ValueError("train_from_scratch must be a boolean.")
-        pretrained_model_langs = ["en", "cs"]
-        if lang not in pretrained_model_langs and train_from_scratch is False:
-            print(f"'{lang}' does not have a pretrained model. You must train from scratch using the train method.")
-            self.train_from_scratch = True
-        if lang in pretrained_model_langs and train_from_scratch is False:
-            print(f"Loading pretrained model for language '{lang}'.")
-        if train_from_scratch is True:
-            print(f"Training model from scratch for language '{lang}'.")
-        if self.train_from_scratch is True:
-            self.sequence_labeller = None
-            return
+
         if torch.cuda.is_available():
             self.device = torch.device('cuda')
         elif torch.backends.mps.is_available():
             self.device = torch.device('mps')
         else:
             self.device = torch.device('cpu')
+
+        if type(lang) is not str:
+            raise ValueError("Language must be a string.")
+        if type(train_from_scratch) is not bool:
+            raise ValueError("train_from_scratch must be a boolean.")
+
+        if lang not in self.PRETRAINED_MODEL_LANGS and train_from_scratch is False and model_path is None:
+            print(f"'{lang}' does not have a pretrained model and you've provided no saved model path. "
+                  f"You must train from scratch using the train method.")
+            self.train_from_scratch = True
+        if self.train_from_scratch is True:
+            print(f"Training model from scratch for language '{lang}'.")
+            self.sequence_labeller = None
+            return
+
         if model_path is not None:
-            self.sequence_labeller = SequenceLabeller.load(model_path, self.device)
-        if model_path is None:
-            with resources.path("testmorphseg.non_spacy.pretrained_models", f"{lang}.pt") as model_path:#path relative to package
+            if is_local is False:
+                print(f"Attempting to download model from Hub: {model_path} for language '{lang}'.")
+                repo_id, filename = model_path.split('/')
+                model_path = download_model_from_hub(repo_id, filename=filename)
+            if is_local is True:
+                print(f"Attempting to load local model for language '{lang}'.")
                 self.sequence_labeller = SequenceLabeller.load(model_path, self.device)
+
+        if model_path is None:
+            repo_id = f"{self.DEFAULT_REPO_PREFIX}/{lang}"
+            filename = f"{lang}.safetensors"
+            print(f"Attempting to load pretrained model from Hub: {repo_id}/{filename} for language '{lang}'.")
+            model_file = download_model_from_hub(repo_id, filename=filename)
+            self.sequence_labeller = SequenceLabeller.load(model_file, self.device)
+
         self.sequence_labeller.settings.device = self.device
         self.sequence_labeller.model.model.to(self.device)
         self.sequence_labeller.model.model.device = self.device
         self.settings = self.sequence_labeller.settings
+        print(f"Model for language '{lang}' loaded successfully.")
 
     def segment(self, text, output_string=False, delimiter=" @@"):
         if self.sequence_labeller is None:

@@ -18,3 +18,5 @@ dependencies:
     - numpy==2.3.4
     - rich==14.2.0
     - editdistance==0.8.1
+    - safetensors==0.6.2
+    - huggingface_hub==1.1.4
