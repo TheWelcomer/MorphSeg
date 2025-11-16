@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "testmorphseg"
+version = "0.0.2"
+description = "Erm... What the Segma?"
+readme = {text = "Long description", content-type = "text/plain"}
+authors = [
+    {name = "Timmald", email = "aprilscout.dog@gmail.com"},
+    {name = "The Welcomer", email = "dwinkelman@umass.edu"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.7"
+dependencies = [
+    "spacy",
+    "torch",
+    "pandas",
+    "tqdm",
+    "numpy<2",
+    "rich",
+    "editdistance",
+]
+
+[project.optional-dependencies]
+spacy = [
+    "spacy>=3.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/TheWelcomer/MorphSeg"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+"testmorphseg.non_spacy.pretrained_models" = ["*.pt"]
+"testmorphseg.non_spacy.data.raw_data.eng" = ["*.tsv"]
