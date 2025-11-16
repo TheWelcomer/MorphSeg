@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
-from library.testmorphseg.models.components.crf import CRF
+from testmorphseg.models.components.crf import CRF
 from typing import Optional
-from library.testmorphseg.models.components.lstm import BiLSTMEncoder
-from library.testmorphseg.models.components.feature_encoder import FeatureEncoder
-from library.testmorphseg.models.components.expansion_layer import ExpansionLayer
+from testmorphseg.models.components.lstm import BiLSTMEncoder
+from testmorphseg.models.components.feature_encoder import FeatureEncoder
+from testmorphseg.models.components.expansion_layer import ExpansionLayer
 
 
 class LSTMModel(nn.Module):

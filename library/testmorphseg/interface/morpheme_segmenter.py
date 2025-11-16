@@ -1,9 +1,9 @@
 import torch
 import re
-from library.testmorphseg.training.sequence_labeller import SequenceLabeller
-from library.testmorphseg.training.oracle import sent2rules, rules2sent
-from library.testmorphseg.utils.settings import Settings
-from library.testmorphseg.training.dataset import RawDataset
+from testmorphseg.training.sequence_labeller import SequenceLabeller
+from testmorphseg.training.oracle import sent2rules, rules2sent
+from testmorphseg.utils.settings import Settings
+from testmorphseg.training.dataset import RawDataset
 import os
 import pandas as pd
 from importlib import resources

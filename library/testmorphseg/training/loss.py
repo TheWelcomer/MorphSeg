@@ -1,9 +1,9 @@
 import torch
 
 from torch import Tensor
-from library.testmorphseg.training.dataset import Batch
-from library.testmorphseg.models.model import LSTMModel
-from library.testmorphseg.utils.util import make_mask_2d
+from testmorphseg.training.dataset import Batch
+from testmorphseg.models.model import LSTMModel
+from testmorphseg.utils.util import make_mask_2d
 from collections import namedtuple
 from torch.nn.functional import cross_entropy
 from torch.nn.functional import ctc_loss as ctc

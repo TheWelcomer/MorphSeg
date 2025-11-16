@@ -5,23 +5,23 @@ import torch.nn as nn
 
 from typing import List
 from typing import Tuple
-from library.testmorphseg.utils.logger import logger
+from testmorphseg.utils.logger import logger
 from typing import Callable
 from typing import Optional
-from library.testmorphseg.models.model import LSTMModel
-from library.testmorphseg.training.metrics import Metrics
-from library.testmorphseg.utils.settings import Settings
-from library.testmorphseg.training.dataset import RawDataset
-from library.testmorphseg.training.metrics import get_metrics
-from library.testmorphseg.training.metrics import metric_names
+from testmorphseg.models.model import LSTMModel
+from testmorphseg.training.metrics import Metrics
+from testmorphseg.utils.settings import Settings
+from testmorphseg.training.dataset import RawDataset
+from testmorphseg.training.metrics import get_metrics
+from testmorphseg.training.metrics import metric_names
 from collections import namedtuple
 from torch.utils.data import DataLoader
 from torch.nn.utils import clip_grad_value_
-from library.testmorphseg.training.dataset import SequenceLabellingDataset
-from library.testmorphseg.training.vocabulary import SequenceLabellingVocabulary
+from testmorphseg.training.dataset import SequenceLabellingDataset
+from testmorphseg.training.vocabulary import SequenceLabellingVocabulary
 from torch.optim import SGD, Adam, AdamW, Optimizer
-from library.testmorphseg.training.inference import argmax_decode, viterbi_decode, ctc_crf_decode
-from library.testmorphseg.training.loss import ctc_loss, crf_loss, cross_entropy_loss, ctc_crf_loss
+from testmorphseg.training.inference import argmax_decode, viterbi_decode, ctc_crf_decode
+from testmorphseg.training.loss import ctc_loss, crf_loss, cross_entropy_loss, ctc_crf_loss
 from torch.optim.lr_scheduler import ExponentialLR, OneCycleLR
 
 Sequence = List[str]
@@ -142,16 +142,14 @@ def moving_avg_loss(old_loss: float, new_loss: float, gamma: float = 0.95) -> fl
 
 def save_model(model: TrainedModel, name: str, path: str) -> str:
     os.makedirs(path, exist_ok=True)
-    model_save_info = dict()
-    model_save_info["model_class"] = type(model.model)
-    model_save_info["parameters"] = model.model.get_params()
-    model_save_info["state_dict"] = model.model.state_dict()
-    model_save_info["source_vocabulary"] = model.source_vocabulary
-    model_save_info["target_vocabulary"] = model.target_vocabulary
-    model_save_info["feature_vocabulary"] = model.feature_vocabulary
-    model_save_info["metrics"] = model.metrics
-    model_save_info["checkpoint"] = model.checkpoint
-    model_save_info["settings"] = model.settings
+    model_save_info = {
+        "parameters": model.model.get_params(),
+        "state_dict": model.model.state_dict(),
+        "source_vocabulary": model.source_vocabulary,
+        "target_vocabulary": model.target_vocabulary,
+        "feature_vocabulary": model.feature_vocabulary,
+        "settings": model.settings,
+    }
 
     save_model_path = os.path.join(path, name + ".pt")
     torch.save(model_save_info, save_model_path)
@@ -162,19 +160,24 @@ def save_model(model: TrainedModel, name: str, path: str) -> str:
 def load_model(path: str, device) -> TrainedModel:
     model_save_info = torch.load(path, weights_only=False, map_location=device)
 
-    model = model_save_info["model_class"](**model_save_info["parameters"])
+    model = LSTMModel(**model_save_info["parameters"])
     model.load_state_dict(model_save_info["state_dict"])
+    model.to(device)
 
     source_vocabulary = model_save_info["source_vocabulary"]
     target_vocabulary = model_save_info["target_vocabulary"]
     feature_vocabulary = model_save_info["feature_vocabulary"]
-    metrics = model_save_info["metrics"]
-    checkpoint = model_save_info["checkpoint"]
     settings = model_save_info["settings"]
+    settings.device = device
 
     return TrainedModel(
-        model=model, source_vocabulary=source_vocabulary, target_vocabulary=target_vocabulary,
-        feature_vocabulary=feature_vocabulary, metrics=metrics, checkpoint=checkpoint, settings=settings
+        model=model,
+        source_vocabulary=source_vocabulary,
+        target_vocabulary=target_vocabulary,
+        feature_vocabulary=feature_vocabulary,
+        metrics=None,
+        checkpoint=None,
+        settings=settings
     )
 
 

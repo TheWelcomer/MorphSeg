@@ -1,3 +1,2 @@
-#import spacy_pipeline
-from library.testmorphseg.interface.morpheme_segmenter import MorphemeSegmenter
-from library.testmorphseg.interface.spacy_component import load_spacy_integration
+from testmorphseg.interface.morpheme_segmenter import MorphemeSegmenter
+from testmorphseg.interface.spacy_component import load_spacy_integration

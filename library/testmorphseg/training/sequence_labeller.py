@@ -3,17 +3,17 @@ from __future__ import annotations
 import torch
 
 from typing import List
-from library.testmorphseg.training.trainer import train
+from testmorphseg.training.trainer import train
 from tqdm.auto import tqdm
 from typing import Optional
-from library.testmorphseg.utils.settings import Settings
-from library.testmorphseg.training.trainer import load_model
-from library.testmorphseg.training.dataset import RawDataset
-from library.testmorphseg.training.trainer import TrainedModel
-from library.testmorphseg.training.inference import Prediction
-from library.testmorphseg.training.trainer import _get_loss_function
+from testmorphseg.utils.settings import Settings
+from testmorphseg.training.trainer import load_model
+from testmorphseg.training.dataset import RawDataset
+from testmorphseg.training.trainer import TrainedModel
+from testmorphseg.training.inference import Prediction
+from testmorphseg.training.trainer import _get_loss_function
 from torch.utils.data import DataLoader
-from library.testmorphseg.training.dataset import SequenceLabellingDataset
+from testmorphseg.training.dataset import SequenceLabellingDataset
 
 
 class SequenceLabeller:
