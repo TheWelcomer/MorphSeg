@@ -1,6 +1,7 @@
 import torch
 import re
 import os
+import collections
 import pandas as pd
 
 from importlib import resources
@@ -13,7 +14,7 @@ from testmorphseg.training.dataset import RawDataset
 
 class MorphemeSegmenter:
     PRETRAINED_REPO_PREFIX = 'MorphSeg'
-    PRETRAINED_MODEL_LANGS = []
+    PRETRAINED_MODEL_LANGS = ['en']
 
     def __init__(self, lang, train_from_scratch=False, model_path=None, is_local=True):
         self.lang = lang
@@ -44,16 +45,16 @@ class MorphemeSegmenter:
             if is_local is False:
                 print(f"Attempting to download model from Hub: {model_path} for language '{lang}'.")
                 repo_id, filename = model_path.split('/')
-                model_path = download_model_from_hub(repo_id, filename=filename)
+                model_path = hf_hub_download(repo_id=repo_id, filename=filename, cache_dir=None)
             if is_local is True:
                 print(f"Attempting to load local model for language '{lang}'.")
                 self.sequence_labeller = SequenceLabeller.load(model_path, self.device)
 
         if model_path is None:
-            repo_id = f"{self.DEFAULT_REPO_PREFIX}/{lang}"
+            repo_id = f"{self.PRETRAINED_REPO_PREFIX}/{lang}"
             filename = f"{lang}.safetensors"
             print(f"Attempting to load pretrained model from Hub: {repo_id}/{filename} for language '{lang}'.")
-            model_file = download_model_from_hub(repo_id, filename=filename)
+            model_file = hf_hub_download(repo_id=repo_id, filename=filename, cache_dir=None)
             self.sequence_labeller = SequenceLabeller.load(model_file, self.device)
 
         self.sequence_labeller.settings.device = self.device
@@ -189,81 +190,94 @@ class MorphemeSegmenter:
         self.sequence_labeller.fit(train_data=train_data, development_data=test_data)
 
     def eval_model(self, test_data_filepath: str) -> dict:
+        """
+        Evaluates the model on a test dataset using SIGMORPHON-compatible metrics.
+        This function now calculates precision, recall, and F1 score based on the
+        multiset of morpheme strings, which is the official method used in the
+        SIGMORPHON 2022 Shared Task.
+        """
         test_data = self._load_data(test_data_filepath)
         sources_test = test_data.sources
         targets_test = test_data.targets
         predictions = self.sequence_labeller.predict(sources=sources_test)
 
-        # Word-level accuracy
+        # Word-level accuracy (exact match on action labels)
         num_correct = 0
 
-        # Edit distance
+        # Edit distance on reconstructed strings
         total_edit_distance = 0
 
-        # Boundary-level metrics
-        true_positives = 0  # Correctly predicted boundaries
-        false_positives = 0  # Incorrectly predicted boundaries
-        false_negatives = 0  # Missed boundaries
+        total_true_positives = 0
+        total_false_positives = 0
+        total_false_negatives = 0
 
         for i in range(len(predictions)):
-            ground_truth = targets_test[i]
-            prediction = predictions[i]
-            target_seq = prediction.prediction
-            source_seq = [prediction.alignment[j].symbol for j in range(len(prediction.alignment))]
+            ground_truth_actions = targets_test[i]
+            prediction_object = predictions[i]
+            predicted_actions = prediction_object.prediction
+            source_chars = [align_pos.symbol for align_pos in prediction_object.alignment]
 
-            # Reconstruct segmentations
-            predicted_segmentation = rules2sent(source_seq, target_seq)
-            gold_segmentation = rules2sent(source_seq, ground_truth)
+            # Reconstruct the segmented strings
+            predicted_segmentation = rules2sent(source_chars, predicted_actions)
+            gold_segmentation = rules2sent(source_chars, ground_truth_actions)
 
-            # Word-level accuracy (exact match)
-            if target_seq == ground_truth:
+            # --- Word-level accuracy (no change here) ---
+            if predicted_actions == ground_truth_actions:
                 num_correct += 1
 
-            # Calculate edit distance (Levenshtein distance)
+            # --- Edit distance (no change here) ---
             edit_dist = self._levenshtein_distance(predicted_segmentation, gold_segmentation)
             total_edit_distance += edit_dist
 
-            # Calculate boundary-level metrics
-            # Extract boundary positions from segmentations
-            pred_boundaries = self._extract_boundaries(predicted_segmentation)
-            gold_boundaries = self._extract_boundaries(gold_segmentation)
+            # Split the segmented strings into lists of morphemes
+            # The delimiter is hard-coded as " @@" to match the oracle's output
+            pred_morphemes = predicted_segmentation.split(" @@")
+            gold_morphemes = gold_segmentation.split(" @@")
 
-            # Count true positives, false positives, and false negatives
-            for boundary in pred_boundaries:
-                if boundary in gold_boundaries:
-                    true_positives += 1
-                else:
-                    false_positives += 1
+            # Use collections.Counter to handle multisets of morphemes correctly
+            pred_morpheme_counts = collections.Counter(pred_morphemes)
+            gold_morpheme_counts = collections.Counter(gold_morphemes)
 
-            for boundary in gold_boundaries:
-                if boundary not in pred_boundaries:
-                    false_negatives += 1
+            # True Positives: The intersection of the two multisets
+            intersection_counts = pred_morpheme_counts & gold_morpheme_counts
+            word_tp = sum(intersection_counts.values())
 
-        # Calculate metrics
+            # False Positives: Morphemes in prediction but not in gold
+            word_fp = len(pred_morphemes) - word_tp
+
+            # False Negatives: Morphemes in gold but not in prediction
+            word_fn = len(gold_morphemes) - word_tp
+
+            # Add the counts for this word to the dataset-wide totals
+            total_true_positives += word_tp
+            total_false_positives += word_fp
+            total_false_negatives += word_fn
+
+        # --- Calculate final metrics ---
         word_accuracy = num_correct / len(predictions) if len(predictions) > 0 else 0
         avg_edit_distance = total_edit_distance / len(predictions) if len(predictions) > 0 else 0
 
-        precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
-        recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0
+        precision = total_true_positives / (total_true_positives + total_false_positives) if (total_true_positives + total_false_positives) > 0 else 0
+        recall = total_true_positives / (total_true_positives + total_false_negatives) if (total_true_positives + total_false_negatives) > 0 else 0
         f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
 
         # Print summary
         print("=" * 80)
-        print("EVALUATION RESULTS")
+        print("EVALUATION RESULTS (SIGMORPHON-COMPATIBLE)")
         print("=" * 80)
         print(f"Total words evaluated:     {len(predictions)}")
         print(f"\nWord-Level Metrics:")
-        print(f"  Exact match accuracy:    {num_correct}/{len(predictions)} = {word_accuracy:.2%}")
+        print(f"  Exact match accuracy (actions): {num_correct}/{len(predictions)} = {word_accuracy:.2%}")
         print(f"\nSegmentation Quality:")
         print(f"  Average edit distance:   {avg_edit_distance:.2f}")
-        print(f"\nBoundary-Level Metrics:")
+        print(f"\nMorpheme-Level Metrics (Official):")
         print(f"  Precision:               {precision:.4f} ({precision * 100:.2f}%)")
         print(f"  Recall:                  {recall:.4f} ({recall * 100:.2f}%)")
         print(f"  F1 Score:                {f1:.4f} ({f1 * 100:.2f}%)")
-        print(f"\nBoundary Counts:")
-        print(f"  True Positives:          {true_positives}")
-        print(f"  False Positives:         {false_positives}")
-        print(f"  False Negatives:         {false_negatives}")
+        print(f"\nMorpheme Counts:")
+        print(f"  True Positives:          {total_true_positives}")
+        print(f"  False Positives:         {total_false_positives}")
+        print(f"  False Negatives:         {total_false_negatives}")
         print("=" * 80)
 
         return {
@@ -274,9 +288,9 @@ class MorphemeSegmenter:
             'f1': f1,
             'num_words': len(predictions),
             'num_correct': num_correct,
-            'true_positives': true_positives,
-            'false_positives': false_positives,
-            'false_negatives': false_negatives
+            'true_positives': total_true_positives,
+            'false_positives': total_false_positives,
+            'false_negatives': total_false_negatives
         }
 
     def _levenshtein_distance(self, s1: str, s2: str) -> int:
@@ -294,16 +308,6 @@ class MorphemeSegmenter:
                 current_row.append(min(insertions, deletions, substitutions))
             previous_row = current_row
         return previous_row[-1]
-
-    def _extract_boundaries(self, segmentation: str, delimiter: str = " @@") -> set:
-        boundaries = set()
-        pos = 0
-        segments = segmentation.split(delimiter)
-        for i, segment in enumerate(segments[:-1]):
-            pos += len(segment)
-            boundaries.add(pos)
-        return boundaries
-
 
     #
     # def _fine_tune(
