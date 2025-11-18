@@ -24,7 +24,7 @@ from testmorphseg.training.vocabulary import SequenceLabellingVocabulary
 from torch.optim import SGD, Adam, AdamW, Optimizer
 from testmorphseg.training.inference import argmax_decode, viterbi_decode, ctc_crf_decode
 from testmorphseg.training.loss import ctc_loss, crf_loss, cross_entropy_loss, ctc_crf_loss
-from torch.optim.lr_scheduler import ExponentialLR, OneCycleLR
+from torch.optim.lr_scheduler import ExponentialLR, OneCycleLR, ReduceLROnPlateau
 
 Sequence = List[str]
 Sequences = List[Sequence]
@@ -104,6 +104,8 @@ def _build_scheduler(optimizer: Optimizer, scheduler: str, gamma: float, pct_sta
         scheduler_instance = ExponentialLR(optimizer=optimizer, gamma=gamma)
     elif scheduler == "one-cycle":
         scheduler_instance = OneCycleLR(optimizer=optimizer, max_lr=lr, total_steps=total_steps, pct_start=pct_start)
+    elif scheduler == "plateau":
+        scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3, threshold=0.0001, threshold_mode='rel')
     else:
         raise ValueError(f"Unknown scheduler: {scheduler}")
 
