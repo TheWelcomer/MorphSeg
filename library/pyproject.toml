@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "testmorphseg"
-version = "0.0.2"
+version = "0.0.5"
 description = "Erm... What the Segma?"
 readme = {text = "Long description", content-type = "text/plain"}
 authors = [
@@ -20,6 +20,8 @@ dependencies = [
     "tqdm",
     "numpy<2",
     "rich",
+    "pyicu",
+    "unicodedata2",
     "editdistance",
     "safetensors",
     "huggingface-hub",

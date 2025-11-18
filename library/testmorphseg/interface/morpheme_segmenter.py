@@ -1,10 +1,15 @@
 import torch
 import re
 import os
+import sys
 import collections
+import warnings
 import pandas as pd
+from icu import BreakIterator, Locale
+import unicodedata2
 
 from importlib import resources
+from tqdm import tqdm
 from huggingface_hub import HfApi, hf_hub_download, upload_file
 from testmorphseg.interface.sequence_labeller import SequenceLabeller
 from testmorphseg.training.oracle import sent2rules, rules2sent
@@ -14,11 +19,11 @@ from testmorphseg.training.dataset import RawDataset
 
 class MorphemeSegmenter:
     PRETRAINED_REPO_PREFIX = 'MorphSeg'
-    PRETRAINED_MODEL_LANGS = ['en']
+    PRETRAINED_MODEL_LANGS = ['en', 'cs']
 
-    def __init__(self, lang, train_from_scratch=False, model_path=None, is_local=True):
+    def __init__(self, lang, load_pretrained=True, model_path=None, is_local=True):
         self.lang = lang
-        self.train_from_scratch = train_from_scratch
+        self.load_pretrained = load_pretrained
 
         if torch.cuda.is_available():
             self.device = torch.device('cuda')
@@ -29,14 +34,14 @@ class MorphemeSegmenter:
 
         if type(lang) is not str:
             raise ValueError("Language must be a string.")
-        if type(train_from_scratch) is not bool:
-            raise ValueError("train_from_scratch must be a boolean.")
+        if type(load_pretrained) is not bool:
+            raise ValueError("load_pretrained must be a boolean.")
 
-        if lang not in self.PRETRAINED_MODEL_LANGS and train_from_scratch is False and model_path is None:
-            print(f"'{lang}' does not have a pretrained model and you've provided no saved model path. "
-                  f"You must train from scratch using the train method.")
-            self.train_from_scratch = True
-        if self.train_from_scratch is True:
+        if lang not in self.PRETRAINED_MODEL_LANGS and load_pretrained is True and model_path is None:
+            warnings.warn(f"'{lang}' does not have a pretrained model and you've provided no saved model path. "
+                          f"You must train from scratch using the train method.")
+            self.load_pretrained = False
+        if self.load_pretrained is False:
             print(f"Training model from scratch for language '{lang}'.")
             self.sequence_labeller = None
             return
@@ -60,7 +65,6 @@ class MorphemeSegmenter:
         self.sequence_labeller.settings.device = self.device
         self.sequence_labeller.model.model.to(self.device)
         self.sequence_labeller.model.model.device = self.device
-        self.settings = self.sequence_labeller.settings
         print(f"Model for language '{lang}' loaded successfully.")
 
     def segment(self, text, output_string=False, delimiter=" @@"):
@@ -75,30 +79,140 @@ class MorphemeSegmenter:
         if text == "":
             return []
 
-        # Extract all words
-        words = re.findall(r"[a-zA-Z'-]+", text)
-        words = [list(word.lower()) for word in words]
-        # Process all words at once
-        predictions = self.sequence_labeller.predict(sources=words)
+        bi = BreakIterator.createWordInstance(Locale(self.lang))
+        bi.setText(text)
+
+        tokens = []
+        word_tokens = []
+        word_positions = []
+
+        start = 0
+        end = bi.nextBoundary()
+
+        while end != -1:
+            token = text[start:end]
+            rule_status = bi.getRuleStatus()
+            is_word = rule_status >= 100
+
+            tokens.append(token)
+
+            if is_word:
+                normalized_token = self._normalize_for_morphology(token)
+                word_tokens.append(list(normalized_token))
+                word_positions.append(len(tokens) - 1)
+
+            start = end
+            end = bi.nextBoundary()
+
+        if not word_tokens:
+            return [] if not output_string else text
+
+        predictions = self.sequence_labeller.predict(sources=word_tokens)
         actions = [pred.prediction for pred in predictions]
-        predicted_segmentations = [rules2sent(source=words[i], actions=actions[i]).replace(" @@", delimiter) for i in range(len(words))]
-        if output_string is True:
-            # Create iterator for transformed words
-            word_iter = iter(predicted_segmentations)
-            # Replace each match with next transformed word
-            return re.sub(r"[a-zA-Z'-]+", lambda m: next(word_iter), text)
-        if output_string is False:
+        segmented = [
+            rules2sent(source=word_tokens[i], actions=actions[i]).replace(" @@", delimiter)
+            for i in range(len(word_tokens))
+        ]
+
+        if not output_string:
             if delimiter == "":
-                return [[char for char in seg] for seg in predicted_segmentations]
-            return [word.split(delimiter) for word in predicted_segmentations]
+                return [[c for c in seg] for seg in segmented]
+            return [seg.split(delimiter) for seg in segmented]
 
-    def train(self, data_filepath: str, save_path: str, test_data_filepath=None, **kwargs):
-        if self.train_from_scratch is True:
-            self._train_from_scratch(data_filepath, save_path, test_data_filepath, **kwargs)
-        # if self.train_from_scratch is False:
-        #     self._fine_tune(data_filepath, save_path, **kwargs)
+        seg_iter = iter(segmented)
+        for pos in word_positions:
+            tokens[pos] = next(seg_iter)
 
-    def _load_data(self, data_filepath: str) -> RawDataset:
+        return "".join(tokens)
+
+    def _normalize_for_morphology(self, text: str) -> str:
+        text = unicodedata2.normalize('NFKC', text)
+        text = text.casefold()
+        text = unicodedata2.normalize('NFC', text)
+        return text
+
+    def train(self, train_data_filepath: str, save_path: str, val_data_filepath=None, delimiter: str = ' @@', **kwargs):
+        if self.sequence_labeller is None:
+            print(f"Training model from scratch for language '{self.lang}'.")
+            self._train_from_scratch(train_data_filepath, save_path, val_data_filepath, delimiter, **kwargs)
+        else:
+            print(f"Fine-tuning existing model for language '{self.lang}'.")
+            self._fine_tune(train_data_filepath, save_path, val_data_filepath, delimiter, **kwargs)
+
+    def _train_from_scratch(self, train_data_filepath: str, save_path: str, val_data_filepath: str, delimiter: str, **kwargs) -> None:
+        if not os.path.exists(train_data_filepath):
+            raise FileNotFoundError(f"Training data file '{train_data_filepath}' not found.")
+        if val_data_filepath is not None and not os.path.exists(val_data_filepath):
+            raise FileNotFoundError(f"Test data file '{val_data_filepath}' not found.")
+
+        # Load train and test data
+        train_data = self._load_data(train_data_filepath, delimiter)
+        val_data = self._load_data(val_data_filepath, delimiter) if val_data_filepath is not None else None
+
+        # Initialize settings
+        settings = Settings(name=self.lang, save_path=save_path, **kwargs)
+
+        # Create and train model
+        self.sequence_labeller = SequenceLabeller(settings=settings)
+        self.sequence_labeller.fit(train_data=train_data, development_data=val_data)
+
+    def _fine_tune(self, train_data_filepath: str, save_path: str, val_data_filepath: str, delimiter: str, **kwargs) -> None:
+        if not os.path.exists(train_data_filepath):
+            raise FileNotFoundError(f"Training dataset '{train_data_filepath}' not found.")
+        if val_data_filepath is not None and not os.path.exists(val_data_filepath):
+            raise FileNotFoundError(f"Validation dataset '{val_data_filepath}' not found.")
+
+        # Load train and val data and filtering datapoints the model can't handle
+        val_data = None
+        source_vocabulary = self.sequence_labeller.model.source_vocabulary
+        target_vocabulary = self.sequence_labeller.model.target_vocabulary
+        train_data = self._load_data(train_data_filepath, delimiter)
+        train_data = self.filter_unsupported_segmentations(train_data, source_vocabulary, target_vocabulary, dataset_name='train')
+        if val_data_filepath is not None:
+            val_data = self._load_data(val_data_filepath, delimiter)
+            val_data = self.filter_unsupported_segmentations(val_data, source_vocabulary, target_vocabulary, dataset_name='validation')
+
+        self.sequence_labeller.settings.save_path = save_path
+        fixed_settings = ['embedding_size', 'hidden_size', 'num_layers', 'use_features', 'feature_embedding_size',
+                          'feature_hidden_size', 'feature_num_layers', 'feature_pooling',]
+
+        for key, value in kwargs.items():
+            if key in fixed_settings:
+                warnings.warn(f"Warning: '{key}' setting cannot be changed during fine-tuning and will be ignored.")
+                continue
+            if not hasattr(self.sequence_labeller.settings, key):
+                warnings.warn(f"Warning: Unknown/unsupported setting '{key}' will be ignored.")
+                continue
+            setattr(self.sequence_labeller.settings, key, value)
+
+        # Create and train model
+        self.sequence_labeller.fit(train_data=train_data, development_data=val_data)
+
+    @staticmethod
+    def filter_unsupported_segmentations(dataset: RawDataset, source_vocabulary, target_vocabulary, dataset_name='unknown') -> RawDataset:
+        filtered_sources = []
+        filtered_targets = []
+
+        for i in range(len(dataset.sources)):
+            source = dataset.sources[i]
+            target = dataset.targets[i]
+
+            source_in_vocab = all(char in source_vocabulary.token2idx for char in source)
+            target_in_vocab = all(action in target_vocabulary.token2idx for action in target)
+
+            if source_in_vocab and target_in_vocab:
+                filtered_sources.append(source)
+                filtered_targets.append(target)
+
+        num_filtered = len(dataset.sources) - len(filtered_sources)
+        pct_filtered = (num_filtered / len(dataset.sources)) * 100 if len(dataset.sources) > 0 else 0
+        if num_filtered > 0:
+            print(f"Filtered out {num_filtered} ({pct_filtered}%) unsupported datapoints due to unknown tokens/actions from the {dataset_name} dataset.")
+
+        return RawDataset(sources=filtered_sources, targets=filtered_targets, features=None)
+
+    @staticmethod
+    def _load_data(data_filepath: str, delimiter: str) -> RawDataset:
         if str(data_filepath).endswith('.csv'):
             df = pd.read_csv(data_filepath)
         elif str(data_filepath).endswith('.tsv'):
@@ -116,7 +230,7 @@ class MorphemeSegmenter:
         passed = 0
 
         # Process each row
-        for _, row in df.iterrows():
+        for _, row in tqdm(df.iterrows(), total=len(df), desc="Generating Action Labels..."):
             source_word = row[df.columns[0]]
             target_word = row[df.columns[1]]
 
@@ -131,6 +245,7 @@ class MorphemeSegmenter:
                 continue
 
             try:
+                target_word = target_word.replace(delimiter, " @@")
                 # Use oracle to convert to input chars and action sequence
                 input_chars, actions = sent2rules(source_word, target_word)
 
@@ -172,31 +287,14 @@ class MorphemeSegmenter:
 
         return RawDataset(sources=sources, targets=targets, features=None)
 
-    def _train_from_scratch(self, train_data_filepath: str, save_path: str, test_data_filepath: str = None, **kwargs) -> None:
-        if not os.path.exists(train_data_filepath):
-            raise FileNotFoundError(f"Training data file '{train_data_filepath}' not found.")
-        if test_data_filepath is not None and not os.path.exists(test_data_filepath):
-            raise FileNotFoundError(f"Test data file '{test_data_filepath}' not found.")
-
-        # Load train and test data
-        train_data = self._load_data(train_data_filepath)
-        test_data = self._load_data(test_data_filepath) if test_data_filepath is not None else None
-
-        # Initialize settings
-        settings = Settings(name=self.lang, save_path=save_path, **kwargs)
-
-        # Create and train model
-        self.sequence_labeller = SequenceLabeller(settings=settings)
-        self.sequence_labeller.fit(train_data=train_data, development_data=test_data)
-
-    def eval_model(self, test_data_filepath: str) -> dict:
+    def eval_model(self, test_data_filepath: str, delimiter: str = ' @@') -> dict:
         """
         Evaluates the model on a test dataset using SIGMORPHON-compatible metrics.
         This function now calculates precision, recall, and F1 score based on the
         multiset of morpheme strings, which is the official method used in the
         SIGMORPHON 2022 Shared Task.
         """
-        test_data = self._load_data(test_data_filepath)
+        test_data = self._load_data(test_data_filepath, delimiter)
         sources_test = test_data.sources
         targets_test = test_data.targets
         predictions = self.sequence_labeller.predict(sources=sources_test)
@@ -308,17 +406,4 @@ class MorphemeSegmenter:
                 current_row.append(min(insertions, deletions, substitutions))
             previous_row = current_row
         return previous_row[-1]
-
-    #
-    # def _fine_tune(
-    #     self, data_filepath: str, save_path: str, name=self.lang, epochs: int = self.settings.epochs,
-    #     batch_size: int = self.settings.batch_size, device: torch.device = self.settings.device,
-    #     scheduler: str = self.settings.scheduler, gamma: float = self.settings.gamma,
-    #     verbose: bool = self.settings.verbose, report_progress_every: int = self.settings.report_progress_every,
-    #     main_metric: str = self.settings.main_metric,
-    #     keep_only_best_checkpoint: bool = self.settings.keep_only_best_checkpoint,
-    #     optimizer: str = self.settings.optimizer, lr: float = self.settings.lr,
-    #     weight_decay: float = self.settings.weight_decay, grad_clip: Optional[float] = self.settings.grad_clip,
-    #     hidden_size: int = 128, num_layers: int = 1, dropout: float = 0.0, tau: int = 1, loss: str = "cross-entropy"
-    # ) -> None:
-    #     return
+# 1220

@@ -98,12 +98,12 @@ def _build_optimizer(model: LSTMModel, optimizer: str, lr: float, weight_decay: 
         raise ValueError(f"Unknown optimizer: {optimizer}")
 
 
-def _build_scheduler(optimizer: Optimizer, scheduler: str, gamma: float, lr: float,
+def _build_scheduler(optimizer: Optimizer, scheduler: str, gamma: float, pct_start: float, lr: float,
                      total_steps: int) -> Callable[[bool], None]:
     if scheduler == "exponential":
         scheduler_instance = ExponentialLR(optimizer=optimizer, gamma=gamma)
     elif scheduler == "one-cycle":
-        scheduler_instance = OneCycleLR(optimizer=optimizer, max_lr=lr, total_steps=total_steps, pct_start=0.1)
+        scheduler_instance = OneCycleLR(optimizer=optimizer, max_lr=lr, total_steps=total_steps, pct_start=pct_start)
     else:
         raise ValueError(f"Unknown scheduler: {scheduler}")
 
@@ -234,7 +234,7 @@ def evaluate_on_development_data(model: TrainedModel, development_data: Sequence
     return metrics
 
 
-def train(train_data: RawDataset, development_data: Optional[RawDataset], settings: Settings) -> TrainedModel:
+def train(model: TrainedModel, train_data: RawDataset, development_data: Optional[RawDataset], settings: Settings) -> TrainedModel:
     if settings.verbose:
         logger.info("Prepare for Training")
         logger.info("Build vocabulary and datasets")
@@ -266,9 +266,10 @@ def train(train_data: RawDataset, development_data: Optional[RawDataset], settin
     if settings.verbose:
         logger.info("Build model")
 
-    model = _build_model(
-        source_vocab_size=len(source_vocabulary), target_vocab_size=len(target_vocabulary), settings=settings
-    )
+    if model is None:
+        model = _build_model(
+            source_vocab_size=len(source_vocabulary), target_vocab_size=len(target_vocabulary), settings=settings
+        )
     print(model)
 
     if settings.verbose:
@@ -290,7 +291,7 @@ def train(train_data: RawDataset, development_data: Optional[RawDataset], settin
         logger.info("Build scheduler")
 
     scheduler_step = _build_scheduler(
-        optimizer, scheduler=settings.scheduler, gamma=settings.gamma, lr=settings.lr, total_steps=total_steps
+        optimizer, scheduler=settings.scheduler, gamma=settings.gamma, pct_start=settings.pct_start, lr=settings.lr, total_steps=total_steps
     )
 
     # Get loss function

@@ -1,7 +1,11 @@
-import pandas as pd
 import os
-
+import sys
+import pandas as pd
 import collections
+from tqdm import tqdm
+
+from rich.progress import track
+
 
 
 def sent2rules(source: str, target: str) -> tuple[list[str], list[str]]:
@@ -181,9 +185,9 @@ def run_oracle(lang, split):
     non_string_skip = 0
     empty_source_skip = 0
 
-    for tuple in test_cases:
-        source = tuple[0]
-        target = tuple[1]
+    for row in tqdm(test_cases, total=len(test_cases), desc="Generating action labels..."):
+        source = row[0]
+        target = row[1]
 
         # Skip non-string cases
         if type(source) is not str or type(target) is not str:

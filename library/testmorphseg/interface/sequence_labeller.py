@@ -32,7 +32,11 @@ class SequenceLabeller:
         return sequence_labeller
 
     def fit(self, train_data: RawDataset, development_data: Optional[RawDataset] = None) -> SequenceLabeller:
-        self.model = train(train_data=train_data, development_data=development_data, settings=self.settings)
+        if self.model is None:
+            self.model = train(model=None, train_data=train_data, development_data=development_data,
+                               settings=self.settings)
+        else:
+            self.model = train(model=self.model.model, train_data=train_data, development_data=development_data, settings=self.settings)
         return self
 
     def predict(self, sources: List[List[str]], features: Optional[List[List[str]]] = None) -> List[Prediction]:
@@ -49,16 +53,15 @@ class SequenceLabeller:
         )
 
         predictions = []
-        model = self.model.model.to(self.settings.device).eval()
 
         for batch in tqdm(evaluation_dataloader, desc="Prediction Progress"):
             with torch.no_grad():
-                logits = model(
+                logits = self.model.model(
                     inputs=batch.sources, lengths=batch.source_lengths,
                     features=batch.features, feature_lengths=batch.feature_lengths
                 )
                 batch_predictions = self.inference(
-                    model=model, logits=logits, lengths=batch.source_lengths, tau=self.settings.tau,
+                    model=self.model.model, logits=logits, lengths=batch.source_lengths, tau=self.settings.tau,
                     sources=batch.raw_sources, target_vocabulary=self.model.target_vocabulary
                 )
                 predictions.extend(batch_predictions)
