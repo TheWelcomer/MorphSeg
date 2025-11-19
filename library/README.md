@@ -26,6 +26,12 @@
   - [Evaluating a Model](#evaluating-a-model)
   - [spaCy Integration](#spacy-integration)
 
+## Important Links
+
+- [GitHub](https://github.com/TheWelcomer/MorphSeg)
+- [PyPI Package](https://pypi.org/project/morphseg/)
+- [Model Repository](https://huggingface.co/MorphSeg)
+ 
 ## Introduction
 Welcome to the MorphSeg library! This is a developing easy-to-use library for the [Tü_Seg model of morpheme segmentation](https://aclanthology.org/2022.sigmorphon-1.13/). This library is built on top of a research repository released by [Leander Girrbach](https://www.eml-munich.de/people/leander-girrbach) for his submission to [The SIGMORPHON 2022 Shared Task on Morpheme Segmentation](https://aclanthology.org/2022.sigmorphon-1.11/). We thank Leander Girrbach for open-sourcing his code and allowing us to build upon it and we thank the [SIGMORPHON 2022 Shared Task](https://aclanthology.org/2022.sigmorphon-1.11/) organizers for curating the datasets and hosting the shared task.
 
