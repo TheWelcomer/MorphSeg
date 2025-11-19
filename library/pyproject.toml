@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "morphseg"
-version = "0.0.9"
+version = "0.1.0.post1"
 description = "A multilingual package for segmenting text into morphemes using supervised deep learning."
-readme = "../LIBRARY_README.md"
+readme = "README.md"
 authors = [
     {name = "Timmald", email = "aprilscout.dog@gmail.com"},
     {name = "The Welcomer", email = "dwinkelman@umass.edu"}
@@ -27,10 +27,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Text Processing",
     "Topic :: Text Processing :: Linguistic",
+    "Topic :: Scientific/Engineering :: Information Analysis",
     "Natural Language :: Czech",
     "Natural Language :: English",
     "Natural Language :: Spanish",
@@ -38,7 +40,6 @@ classifiers = [
     "Natural Language :: Hungarian",
     "Natural Language :: Italian",
     "Natural Language :: Latin",
-    "Natural Language :: Mongolian",
     "Natural Language :: Russian",
 ]
 license = {text = "MIT"}
