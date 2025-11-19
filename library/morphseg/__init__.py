@@ -1,0 +1,2 @@
+from morphseg.interface.morpheme_segmenter import MorphemeSegmenter
+from morphseg.interface.spacy_component import load_spacy_integration

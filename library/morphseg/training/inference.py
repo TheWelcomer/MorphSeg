@@ -3,10 +3,10 @@ import numpy as np
 
 from typing import List
 from torch import Tensor
-from testmorphseg.models.model import LSTMModel
-from testmorphseg.utils.util import make_mask_2d
+from morphseg.models.model import LSTMModel
+from morphseg.utils.util import make_mask_2d
 from collections import namedtuple
-from testmorphseg.training.vocabulary import SequenceLabellingVocabulary
+from morphseg.training.vocabulary import SequenceLabellingVocabulary
 
 AlignmentPosition = namedtuple("AlignmentPosition", ["symbol", "predictions"])
 Prediction = namedtuple("TransducerPrediction", ["prediction", "alignment"])

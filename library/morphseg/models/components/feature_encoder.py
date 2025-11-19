@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
-from testmorphseg.utils.util import make_mask_2d
-from testmorphseg.models.components.lstm import BiLSTMEncoder
-from testmorphseg.models.components.attention import MLPAttention
-from testmorphseg.models.components.attention import DotProductAttention
+from morphseg.utils.util import make_mask_2d
+from morphseg.models.components.lstm import BiLSTMEncoder
+from morphseg.models.components.attention import MLPAttention
+from morphseg.models.components.attention import DotProductAttention
 
 
 def _mask_sequences_for_pooling(sequences: Tensor, lengths: Tensor, value: float) -> Tensor:

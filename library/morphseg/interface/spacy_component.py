@@ -3,7 +3,7 @@ import warnings
 
 from spacy.language import Language
 from spacy.tokens import Doc, Token, Span
-from testmorphseg.interface.morpheme_segmenter import MorphemeSegmenter
+from morphseg.interface.morpheme_segmenter import MorphemeSegmenter
 
 Token.set_extension("morphemes", default=None)  # do this in the global scope so it happens when imported
 Span.set_extension("morphemes",

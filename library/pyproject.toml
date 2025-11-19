@@ -1,35 +1,60 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel>=0.36.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "testmorphseg"
-version = "0.0.6"
-description = "Erm... What the Segma?"
-readme = {text = "Long description", content-type = "text/plain"}
+name = "morphseg"
+version = "0.0.9"
+description = "A multilingual package for segmenting text into morphemes using supervised deep learning."
+readme = "../LIBRARY_README.md"
 authors = [
     {name = "Timmald", email = "aprilscout.dog@gmail.com"},
     {name = "The Welcomer", email = "dwinkelman@umass.edu"}
 ]
+keywords = ["NLP", "Morphology", "Deep Learning", "Spacy", "Segmentation", "Multilingual"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing",
+    "Topic :: Text Processing :: Linguistic",
+    "Natural Language :: Czech",
+    "Natural Language :: English",
+    "Natural Language :: Spanish",
+    "Natural Language :: French",
+    "Natural Language :: Hungarian",
+    "Natural Language :: Italian",
+    "Natural Language :: Latin",
+    "Natural Language :: Mongolian",
+    "Natural Language :: Russian",
+]
 license = {text = "MIT"}
 requires-python = ">=3.7"
 dependencies = [
-    "spacy",
-    "torch",
-    "pandas",
-    "tqdm",
-    "numpy<2",
-    "rich",
-    "pyicu",
-    "unicodedata2",
-    "editdistance",
-    "safetensors",
-    "huggingface-hub",
-]
-
-[project.optional-dependencies]
-spacy = [
-    "spacy>=3.0.0"
+    "spacy>=3.0.0",
+    "torch>=2.0.0",
+    "pandas>=2.0.0",
+    "tqdm>=4.1.0",
+    "numpy>=1.20.0",
+    "rich>=1.0.0",
+    "regex>=2022.1.18",
+    "unicodedata2>=15.0.0",
+    "editdistance>=0.6.0",
+    "safetensors>=0.3.0",
+    "huggingface-hub>=0.20.0",
 ]
 
 [project.urls]

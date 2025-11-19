@@ -5,7 +5,7 @@ from typing import Optional
 from collections import namedtuple
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
-from testmorphseg.training.vocabulary import SequenceLabellingVocabulary
+from morphseg.training.vocabulary import SequenceLabellingVocabulary
 
 Batch = namedtuple(
     "Batch",

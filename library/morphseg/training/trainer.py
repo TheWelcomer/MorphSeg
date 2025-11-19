@@ -7,23 +7,23 @@ import json
 from safetensors.torch import save_file, load_file
 from typing import List
 from typing import Tuple
-from testmorphseg.utils.logger import logger
+from morphseg.utils.logger import logger
 from typing import Callable
 from typing import Optional
-from testmorphseg.models.model import LSTMModel
-from testmorphseg.training.metrics import Metrics
-from testmorphseg.utils.settings import Settings
-from testmorphseg.training.dataset import RawDataset
-from testmorphseg.training.metrics import get_metrics
-from testmorphseg.training.metrics import metric_names
+from morphseg.models.model import LSTMModel
+from morphseg.training.metrics import Metrics
+from morphseg.utils.settings import Settings
+from morphseg.training.dataset import RawDataset
+from morphseg.training.metrics import get_metrics
+from morphseg.training.metrics import metric_names
 from collections import namedtuple
 from torch.utils.data import DataLoader
 from torch.nn.utils import clip_grad_value_
-from testmorphseg.training.dataset import SequenceLabellingDataset
-from testmorphseg.training.vocabulary import SequenceLabellingVocabulary
+from morphseg.training.dataset import SequenceLabellingDataset
+from morphseg.training.vocabulary import SequenceLabellingVocabulary
 from torch.optim import SGD, Adam, AdamW, Optimizer
-from testmorphseg.training.inference import argmax_decode, viterbi_decode, ctc_crf_decode
-from testmorphseg.training.loss import ctc_loss, crf_loss, cross_entropy_loss, ctc_crf_loss
+from morphseg.training.inference import argmax_decode, viterbi_decode, ctc_crf_decode
+from morphseg.training.loss import ctc_loss, crf_loss, cross_entropy_loss, ctc_crf_loss
 from torch.optim.lr_scheduler import ExponentialLR, OneCycleLR, ReduceLROnPlateau
 
 Sequence = List[str]

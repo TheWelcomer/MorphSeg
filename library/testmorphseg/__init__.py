@@ -1,2 +1,0 @@
-from testmorphseg.interface.morpheme_segmenter import MorphemeSegmenter
-from testmorphseg.interface.spacy_component import load_spacy_integration
