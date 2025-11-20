@@ -15,9 +15,9 @@ def predict(segmenter, word: str) -> list[str]:
     return segmenter.segment(word)[0]
 
 
-@Language.factory("morpheme_segmenter", default_config={"model_path": None, "load_pretrained": True})
-def seg_factory(nlp, name, model_path, load_pretrained):  # stateful component to handle different languages
-    segmenter = MorphemeSegmenter(nlp.lang, model_path=model_path, load_pretrained=load_pretrained)
+@Language.factory("morpheme_segmenter", default_config={"model_filepath": None, "load_pretrained": True})
+def seg_factory(nlp, name, model_filepath, load_pretrained):  # stateful component to handle different languages
+    segmenter = MorphemeSegmenter(nlp.lang, model_filepath=model_filepath, load_pretrained=load_pretrained)
     nlp.segmenter = segmenter  # attach segmenter to nlp object for access later
 
     def segment_doc(doc):
@@ -28,9 +28,9 @@ def seg_factory(nlp, name, model_path, load_pretrained):  # stateful component t
     return segment_doc
 
 
-def load_spacy_integration(lang, model_path=None, load_pretrained=True):
+def load_spacy_integration(lang, model_filepath=None, load_pretrained=True):
     cls = spacy.util.get_lang_class(lang)
     seg = MorphemeSegmenter(lang)
     nlp = cls()
-    nlp.add_pipe("morpheme_segmenter", config={"model_path": model_path, "load_pretrained": load_pretrained})
+    nlp.add_pipe("morpheme_segmenter", config={"model_filepath": model_filepath, "load_pretrained": load_pretrained})
     return nlp
