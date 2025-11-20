@@ -2,10 +2,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI](https://img.shields.io/badge/PyPI-0.0.8-orange.svg)](https://pypi.org/project/morphseg/)
+[![PyPI](https://img.shields.io/badge/PyPI-0.1.0.post3-orange.svg)](https://pypi.org/project/morphseg/)
 [![GitHub repo](https://img.shields.io/badge/GitHub-repo-blue)](https://github.com/TheWelcomer/MorphSeg)
 
 ## Table of Contents
+- [Important Links](#important-links)
 - [Introduction](#introduction)
 - [Authors and License](#authors-and-license)
 - [Background](#background)
