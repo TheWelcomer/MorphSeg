@@ -72,7 +72,7 @@ class MorphemeSegmenter:
         if type(delimiter) is not str:
             raise ValueError("Delimiter must be a string.")
         if text == "":
-            return []
+            return [] if not output_string else ""
 
         tokens, word_tokens, word_positions = self._tokenize(text)
 

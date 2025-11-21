@@ -12,7 +12,10 @@ Doc.set_extension("morphemes", getter=lambda obj: [i._.morphemes for i in obj])
 
 
 def predict(segmenter, word: str) -> list[str]:
-    return segmenter.segment(word)[0]
+    result = segmenter.segment(word)
+    if not result or len(result) == 0:
+        return [word]
+    return result[0]
 
 
 @Language.factory("morpheme_segmenter", default_config={"load_pretrained": True, "model_filepath": None, "is_local": True})
