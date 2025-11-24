@@ -301,8 +301,7 @@ import morphseg
 import spacy
 
 # Load your existing spaCy model
-cls = spacy.util.get_lang_class("en")
-nlp = cls()
+nlp = spacy.blank("en")
 
 # Add the morpheme segmenter to the pipeline
 nlp.add_pipe("morpheme_segmenter")
