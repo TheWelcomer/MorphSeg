@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI](https://img.shields.io/badge/PyPI-0.1.4.post1-orange.svg)](https://pypi.org/project/morphseg/)
+[![PyPI](https://img.shields.io/badge/PyPI-0.1.4-orange.svg)](https://pypi.org/project/morphseg/)
 [![GitHub repo](https://img.shields.io/badge/GitHub-repo-blue)](https://github.com/TheWelcomer/MorphSeg)
 
 <img src="library/logo.png" alt="MorphSeg Logo" width="200"/>
