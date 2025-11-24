@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI](https://img.shields.io/badge/PyPI-0.1.3.post1-orange.svg)](https://pypi.org/project/morphseg/)
+[![PyPI](https://img.shields.io/badge/PyPI-0.1.4.post1-orange.svg)](https://pypi.org/project/morphseg/)
 [![GitHub repo](https://img.shields.io/badge/GitHub-repo-blue)](https://github.com/TheWelcomer/MorphSeg)
 
 <img src="logo.png" alt="MorphSeg Logo" width="200"/>
@@ -23,37 +23,6 @@ MorphSeg uses the [Tü_Seg model of morpheme segmentation](https://aclanthology.
 
 ## Authors and License
 This library is licensed under the MIT license, please see the [LICENSE.TXT](LICENSE.TXT) for more details. The library is being developed and maintained by [Nathan Wolf](https://www.linkedin.com/in/nathanw0lf/) and [Donald Winkelman](https://www.dwink.dev/). [Cynthia Kong](https://www.linkedin.com/in/cynthia-kong-9785b2260/), [Alexis Therrien](https://github.com/block36underscore), and [Taoran Ye](https://www.linkedin.com/in/taoran-ye-5a103b359/) additionally created the frontend demo website for the MorphSeg library.
-
-# Background
-## Problem
-The Problem of Morpheme Segmentation is as follows: given a word, what are the morphemes of the word?
-
-## Motivation
-Morphemes are the smallest meaningful units of text. For example, segmenting the word "morphemes" would look something like ["morph","eme","s"]. There are 2 types of morpheme segmentation: surface and canonical. This library does canonical morpheme segmentation, as it is more linguistically meaningful, ignoring things like inflection and conjugation to display the true morphemes. For example, while a surface segmentation of "manliness" might be ["man","li","ness"], a canonical segmentation would be ["man","ly","ness"], allowing for the "li" morpheme of "manliness" to be counted as an occurence of "ly", as it should. This is useful for many different linguistic/NLP analyses of text, as you can more easily determine the meaningful features imparted on words by their morphemes.
-
-## Approach
-We solve this problem by making use of a plain BiLSTM model architecture named Tü_Seg, which has been shown to be effective for sequence labeling tasks such as morpheme segmentation. A major advantage of this model is its small size (~5-50 MB) and extremely fast speed even on a CPU. Tü_Seg outputs BIO tags for each character in the input word. Each BIO tag contains a list of actions to be performed on the character to map it to the segmented output. The actions are as follows:
-- COPY: Copy the character to the output.
-- SEP: Append a morpheme separator (e.g., " @@") to the output after the character.
-- DELETE: Do not copy the character to the output.
-- (ADD_`<char>`): Add the character `<char>` to the output.
-- There are additional actions such as substitutions that are used to boost performance. Please look at the `oracle.py` code for more details.
-
-## Example
-Given the input word "unhappiness", the model might output the following BIO tags:
-- u: [COPY]
-- n: [COPY, SEP]
-- h: [COPY]
-- a: [COPY]
-- p: [COPY]
-- p: [COPY]
-- i: [ADD_y, SEP]
-- n: [COPY]
-- e: [COPY]
-- s: [COPY]
-- s: [COPY]
-
-Using these tags, we can reconstruct the segmented output as "un @@ happy @@ ness".
 
 # Features
 The MorphSeg library provides the following features:
@@ -383,3 +352,48 @@ segmenter = MorphemeSegmenter(
     is_local=False
 )
 ```
+# Background
+## Problem
+The Problem of Morpheme Segmentation is as follows: given a word, what are the morphemes of the word?
+
+## Motivation
+Morphemes are the smallest meaningful units of text. For example, segmenting the word "morphemes" would look something like ["morph","eme","s"]. There are 2 types of morpheme segmentation: surface and canonical. This library does canonical morpheme segmentation, as it is more linguistically meaningful, ignoring things like inflection and conjugation to display the true morphemes. For example, while a surface segmentation of "manliness" might be ["man","li","ness"], a canonical segmentation would be ["man","ly","ness"], allowing for the "li" morpheme of "manliness" to be counted as an occurence of "ly", as it should. This is useful for many different linguistic/NLP analyses of text, as you can more easily determine the meaningful features imparted on words by their morphemes.
+
+## Approach
+We solve this problem by making use of a plain BiLSTM model architecture named Tü_Seg, which has been shown to be effective for sequence labeling tasks such as morpheme segmentation. A major advantage of this model is its small size (~5-50 MB) and extremely fast speed even on a CPU. Tü_Seg outputs BIO tags for each character in the input word. Each BIO tag contains a list of actions to be performed on the character to map it to the segmented output. The actions are as follows:
+- COPY: Copy the character to the output.
+- SEP: Append a morpheme separator (e.g., " @@") to the output after the character.
+- DELETE: Do not copy the character to the output.
+- (ADD_`<char>`): Add the character `<char>` to the output.
+- There are additional actions such as substitutions that are used to boost performance. Please look at the `oracle.py` code for more details.
+
+## Example
+Given the input word "unhappiness", the model might output the following BIO tags:
+- u: [COPY]
+- n: [COPY, SEP]
+- h: [COPY]
+- a: [COPY]
+- p: [COPY]
+- p: [COPY]
+- i: [ADD_y, SEP]
+- n: [COPY]
+- e: [COPY]
+- s: [COPY]
+- s: [COPY]
+
+Using these tags, we can reconstruct the segmented output as "un @@ happy @@ ness".
+
+## Accuracy
+The following are the accuracy scores on the [SIGMORPHOM 2022 Shared Task](https://aclanthology.org/2022.sigmorphon-1.11.pdf) test sets for morpheme segmentation:
+
+| Language | Precision | Recall | F1 Score | Total Word Accuracy |
+|----------|-----------|--------|----------|---------------------|
+| en       | 0.9133    | 0.9132 | 0.9132   | 86.63%              |
+| es       | 0.9755    | 0.9731 | 0.9743   | 94.38%              |
+| ru       | 0.9549    | 0.9523 | 0.9536   | 87.47%              |
+| fr       | 0.9331    | 0.9294 | 0.9312   | 87.32%              |
+| it       | 0.9387    | 0.9361 | 0.9374   | 88.39%              |
+| cs       | 0.9384    | 0.9255 | 0.9319   | 85.80%              |
+| hu       | 0.9766    | 0.9842 | 0.9804   | 95.96%              |
+| mn       | 0.9774    | 0.9766 | 0.9770   | 95.95%              |
+| la       | 0.9824    | 0.9850 | 0.9837   | 97.44%              |
