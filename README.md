@@ -10,7 +10,7 @@
 ## Important Links
 
 - [Demo Website](https://huggingface.co/spaces/Morphological-Segmentation/Morpheme_Segmentation_Demo)
-- [Demo Colab Notebook](https://colab.research.google.com/drive/1FeaLVhRpDSYwSJUbmmVLKPQIP5N5hb40?usp=sharing)
+- [Demo Colab Notebook](https://colab.research.google.com/drive/1alisdnbCQCRhvdT9DhMnRNRuDLIZLZho#scrollTo=QB6uAXxWoffA)
 - [GitHub](https://github.com/TheWelcomer/MorphSeg)
 - [PyPI Package](https://pypi.org/project/morphseg/)
 - [Hugging Face Repository](https://huggingface.co/MorphSeg)
