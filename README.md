@@ -2,39 +2,23 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI](https://img.shields.io/badge/PyPI-0.1.2-orange.svg)](https://pypi.org/project/morphseg/)
+[![PyPI](https://img.shields.io/badge/PyPI-0.1.3.post1-orange.svg)](https://pypi.org/project/morphseg/)
 [![GitHub repo](https://img.shields.io/badge/GitHub-repo-blue)](https://github.com/TheWelcomer/MorphSeg)
 
-## Table of Contents
-- [Important Links](#important-links)
-- [Introduction](#introduction)
-- [Authors and License](#authors-and-license)
-- [Background](#background)
-  - [Problem](#problem)
-  - [Motivation](#motivation)
-  - [Approach](#approach)
-  - [Example](#example)
-- [Features](#features)
-- [Library Usage](#library-usage)
-  - [Installation](#installation)
-  - [Language Codes with Pretrained Models](#language-codes-with-pretrained-models)
-  - [Data Format](#data-format)
-  - [Method Headers](#method-headers)
-- [Script Examples](#script-examples)
-  - [Segmentation](#segmentation)
-  - [Training from Scratch](#training-from-scratch)
-  - [Fine-tuning a Pretrained Model](#fine-tuning-a-pretrained-model)
-  - [Evaluating a Model](#evaluating-a-model)
-  - [spaCy Integration](#spacy-integration)
+<img src="library/logo.png" alt="MorphSeg Logo" width="200"/>
 
 ## Important Links
 
+- [Demo Website](https://huggingface.co/spaces/Morphological-Segmentation/Morpheme_Segmentation_Demo)
 - [GitHub](https://github.com/TheWelcomer/MorphSeg)
 - [PyPI Package](https://pypi.org/project/morphseg/)
-- [Model Repository](https://huggingface.co/MorphSeg)
+- [Hugging Face Repository](https://huggingface.co/MorphSeg)
  
+## tldr
+Welcome to the MorphSeg library! [MorphSeg](https://github.com/TheWelcomer/MorphSeg) is a morpheme segmentation library and SpaCy pipeline which supports segmentation for 9 languages (english, spanish, russian, french, italian, czech, hungarian, mongolian, and latin). The pretrained models are high-accuracy, small (~3M Params), and efficient (~500 words/second on a Macbook GPU) neural nets. The interface is designed to be simple, just initialize a MorphemeSegmenter class with your language of choice and call .segment() with your text as input!. You can also use this library by initializing SpaCy as usual and adding the morpheme_segmenter pipeline to get segmentations!
+
 ## Introduction
-Welcome to the MorphSeg library! This is a developing easy-to-use library for the [Tü_Seg model of morpheme segmentation](https://aclanthology.org/2022.sigmorphon-1.13/). This library is built on top of a research repository released by [Leander Girrbach](https://www.eml-munich.de/people/leander-girrbach) for his submission to [The SIGMORPHON 2022 Shared Task on Morpheme Segmentation](https://aclanthology.org/2022.sigmorphon-1.11/). We thank Leander Girrbach for open-sourcing his code and allowing us to build upon it and we thank the [SIGMORPHON 2022 Shared Task](https://aclanthology.org/2022.sigmorphon-1.11/) organizers for curating the datasets and hosting the shared task.
+MorphSeg uses the [Tü_Seg model of morpheme segmentation](https://aclanthology.org/2022.sigmorphon-1.13/). This library is built on top of a research repository released by [Leander Girrbach](https://www.eml-munich.de/people/leander-girrbach) for his submission to [The SIGMORPHON 2022 Shared Task on Morpheme Segmentation](https://aclanthology.org/2022.sigmorphon-1.11/). We thank Leander Girrbach for open-sourcing his code and allowing us to build upon it and we thank the [SIGMORPHON 2022 Shared Task](https://aclanthology.org/2022.sigmorphon-1.11/) organizers for curating the datasets and hosting the shared task.
 
 ## Authors and License
 This library is licensed under the MIT license, please see the [LICENSE.TXT](LICENSE.TXT) for more details. The library is being developed and maintained by [Nathan Wolf](https://www.linkedin.com/in/nathanw0lf/) and [Donald Winkelman](https://www.dwink.dev/). [Cynthia Kong](https://www.linkedin.com/in/cynthia-kong-9785b2260/), [Alexis Therrien](https://github.com/block36underscore), and [Taoran Ye](https://www.linkedin.com/in/taoran-ye-5a103b359/) additionally created the frontend demo website for the MorphSeg library.
@@ -52,6 +36,7 @@ We solve this problem by making use of a plain BiLSTM model architecture named T
 - SEP: Append a morpheme separator (e.g., " @@") to the output after the character.
 - DELETE: Do not copy the character to the output.
 - (ADD_`<char>`): Add the character `<char>` to the output.
+- There are additional actions such as substitutions that are used to boost performance. Please look at the `oracle.py` code for more details.
 
 ## Example
 Given the input word "unhappiness", the model might output the following BIO tags:
@@ -343,7 +328,7 @@ You can also add the morpheme segmenter to an existing spaCy pipeline:
 
 ```python
 import spacy
-from morphseg import MorphemeSegmenter
+import morphseg
 
 # Load your existing spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -373,7 +358,7 @@ print(segmented)  # "un-happy-ness"
 
 # Use no delimiter (returns individual characters/morphemes)
 segmented = segmenter.segment("unhappiness", output_string=False, delimiter="")
-print(segmented)  # [['u', 'n'], ['h', 'a', 'p', 'p', 'y'], ['n', 'e', 's', 's']]
+print(segmented)  # [["un", "happy", "ness"]]
 ```
 
 ### Loading Custom Models
