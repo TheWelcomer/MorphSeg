@@ -245,7 +245,7 @@ if __name__ == '__main__':
     )
     
     # Evaluate the trained model
-    segmenter.eval_model("test_data.csv")
+    segmenter.eval("test_data.csv")
 ```
 
 ## Fine-tuning a Pretrained Model
@@ -272,7 +272,7 @@ if __name__ == '__main__':
     )
     
     # Evaluate fine-tuned model
-    results = segmenter.eval_model("domain_specific_test.csv")
+    results = segmenter.eval("domain_specific_test.csv")
     print(f"Fine-tuned F1 Score: {results['f1']:.2%}")
 ```
 
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     segmenter = MorphemeSegmenter("en")
     
     # Evaluate on test set
-    segmenter.eval_model("test_data.csv")
+    segmenter.eval("test_data.csv")
 ```
 
 ## spaCy Integration

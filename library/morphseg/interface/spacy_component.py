@@ -31,7 +31,7 @@ def seg_factory(nlp, name, load_pretrained, model_filepath, is_local):  # statef
     return segment_doc
 
 
-def load_spacy_integration(lang, load_pretrained=True, model_filepath=None):
+def load_spacy_integration(lang, load_pretrained=True, model_filepath=None, is_local=True):
     cls = spacy.util.get_lang_class(lang)
     nlp = cls()
     nlp.add_pipe("morpheme_segmenter", config={"load_pretrained": load_pretrained, "model_filepath": model_filepath, "is_local": is_local})
