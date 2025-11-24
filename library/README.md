@@ -270,7 +270,7 @@ from morphseg import load_spacy_integration
 nlp = load_spacy_integration("en")
 
 # Process text
-doc = nlp("The unhappiness and preprocessing are irreversible")
+doc = nlp("The unbelievably disagreeable preprocessor unsuccessfully reprocessed the unquestionably irreversible decontextualization")
 
 # Access morphemes for each token
 for token in doc:
@@ -297,18 +297,29 @@ irreversible: ['ir', 'revers', 'ible']
 You can also add the morpheme segmenter to an existing spaCy pipeline:
 
 ```python
-import spacy
 import morphseg
+import spacy
 
 # Load your existing spaCy model
-nlp = spacy.load("en_core_web_sm")
+cls = spacy.util.get_lang_class("en")
+nlp = cls()
 
-# Add morpheme segmentation to the pipeline
-nlp.add_pipe("morpheme_segmenter", config={"load_pretrained": True})
+# Add the morpheme segmenter to the pipeline
+nlp.add_pipe("morpheme_segmenter")
 
-# Now use as normal
-doc = nlp("preprocessing")
-print(doc[0]._.morphemes)  # ['pre', 'process', 'ing']
+# Process the text
+doc = nlp("The unbelievably disagreeable preprocessor unsuccessfully reprocessed the unquestionably irreversible decontextualization")
+
+# Access morphemes for each token
+for token in doc:
+    print(f"{token.text}: {token._.morphemes}")
+
+# Access morphemes for spans
+span = doc[1:3]
+print(f"Span morphemes: {span._.morphemes}")
+
+# Access morphemes for the entire document
+print(f"All morphemes: {doc._.morphemes}") # [['the'], ['un', 'believe', 'able', 'ly'], ['dis', 'agree', 'able'], ['pre', 'process', 'or'], ['un', 'success', 'ful', 'ly'], ['re', 'process', 'ed'], ['the'], ['un', 'question', 'able', 'ly'], ['in', 'reverse', 'ible'], ['decontextual', 'ization']]
 ```
 
 ---
