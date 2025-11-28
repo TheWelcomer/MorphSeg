@@ -23,7 +23,7 @@ from morphseg.training.dataset import SequenceLabellingDataset
 from morphseg.training.vocabulary import SequenceLabellingVocabulary
 from torch.optim import SGD, Adam, AdamW, Optimizer
 from morphseg.training.inference import argmax_decode, viterbi_decode, ctc_crf_decode
-from morphseg.training.loss import ctc_loss, crf_loss, cross_entropy_loss, ctc_crf_loss
+from morphseg.training.loss import ctc_loss, crf_loss, cross_entropy_loss, ctc_crf_loss, entmax_loss
 from torch.optim.lr_scheduler import ExponentialLR, OneCycleLR, ReduceLROnPlateau
 
 Sequence = List[str]
@@ -123,6 +123,8 @@ def _build_scheduler(optimizer: Optimizer, scheduler: str, gamma: float, pct_sta
 def _get_loss_function(loss: str) -> Tuple[Callable, Callable]:
     if loss == "cross-entropy":
         return cross_entropy_loss, argmax_decode
+    elif loss == "entmax":
+        return entmax_loss, argmax_decode
     elif loss == "ctc":
         return ctc_loss, argmax_decode
     elif loss == "crf":

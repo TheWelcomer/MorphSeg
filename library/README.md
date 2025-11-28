@@ -134,7 +134,7 @@ def train(self, train_data_filepath: str, save_path: str, val_data_filepath: str
         num_layers (int): Number of LSTM layers (default: 2)
         dropout (float): Dropout rate (default: 0.2)
         tau (int): Expansion factor for output sequence (default: 1)
-        loss (str): Loss function ("cross-entropy", "crf", "ctc", "ctc-crf") (default: "cross-entropy")
+        loss (str): Loss function ("ent-max", "cross-entropy", "crf", "ctc", "ctc-crf") (default: "ent-max")
         use_features (bool): Use additional features (default: False)
         feature_embedding_size (int): Feature embedding dimension (default: 32)
         feature_hidden_size (int): Feature encoder hidden dimension (default: 128)

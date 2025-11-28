@@ -7,6 +7,7 @@ from morphseg.utils.util import make_mask_2d
 from collections import namedtuple
 from torch.nn.functional import cross_entropy
 from torch.nn.functional import ctc_loss as ctc
+from entmax import entmax15_loss
 
 ModelOutput = namedtuple("ModelOutput", field_names=["loss", "logits"])
 
@@ -16,6 +17,33 @@ def _get_logits(model: LSTMModel, batch: Batch) -> Tensor:
         inputs=batch.sources, lengths=batch.source_lengths,
         features=batch.features, feature_lengths=batch.feature_lengths
     )
+
+
+def entmax_loss(model: LSTMModel, batch: Batch, reduction: str = "mean") -> ModelOutput:
+    logits = _get_logits(model=model, batch=batch)
+    flattened_logits = torch.flatten(logits, end_dim=-2)
+    flattened_targets = torch.flatten(batch.targets).to(logits.device)
+
+    # Manually handle ignore_index since entmax15_loss doesn't support it
+    mask = flattened_targets != 0  # Create mask for non-padding tokens
+    masked_logits = flattened_logits[mask]
+    masked_targets = flattened_targets[mask]
+
+    # Compute loss (entmax15_loss doesn't support reduction parameter)
+    loss = entmax15_loss(masked_logits, masked_targets)
+
+    # Manually apply reduction
+    if reduction == "mean":
+        loss = loss.mean()
+    elif reduction == "sum":
+        loss = loss.sum()
+    elif reduction == "none":
+        # Reconstruct full tensor with zeros for padding
+        full_loss = torch.zeros(flattened_targets.size(0), device=logits.device)
+        full_loss[mask] = loss
+        loss = full_loss
+
+    return ModelOutput(loss=loss, logits=logits)
 
 
 def cross_entropy_loss(model: LSTMModel, batch: Batch, reduction: str = "mean") -> ModelOutput:
