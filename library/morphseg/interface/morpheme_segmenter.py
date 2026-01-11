@@ -293,7 +293,7 @@ class MorphemeSegmenter:
         return tokens, word_tokens, word_positions
 
     @staticmethod
-    def _normalize_for_morphology(text: str) -> str:
+    def normalize_for_morphology(text: str) -> str:
         text = unicodedata2.normalize('NFKC', text)
         text = text.casefold()
         text = unicodedata2.normalize('NFC', text)

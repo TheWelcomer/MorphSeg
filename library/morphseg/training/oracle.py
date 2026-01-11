@@ -134,7 +134,8 @@ def sent2rules(source: str, target: str) -> tuple[list[str], list[str]]:
     return list(source), final_actions
 # Comprehensive test suite
 
-def rules2sent(source: str, actions: list[str]) -> str:
+
+def rules2sent(source: str | list[str], actions: list[str]) -> str:
     """
     Reconstructs the target morpheme string from a source word and a sequence
     of structured action labels.
