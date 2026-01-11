@@ -26,6 +26,7 @@ class SequenceLabeller:
     def load(cls, path: str, device) -> SequenceLabeller:
         print(path)
         model = load_model(path, device)
+        model.model.eval()
         sequence_labeller = cls(settings=model.settings)
         sequence_labeller.model = model
 

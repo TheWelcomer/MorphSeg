@@ -19,8 +19,18 @@ from morphseg.training.dataset import RawDataset
 
 
 class MorphemeSegmenter:
-    PRETRAINED_REPO_PREFIX = 'MorphSeg'
     PRETRAINED_MODEL_LANGS = ['cs', 'en', 'es', 'fr', 'hu', 'it', 'la', 'mn', 'ru']
+    PRETRAINED_MODEL_LANGS_TO_HF_IDS = {
+        'en': 'Morphological-Segmentation/en2',
+        'es': 'Morphological-Segmentation/es',
+        'ru': 'Morphological-Segmentation/ru',
+        'fr': 'Morphological-Segmentation/fr',
+        'it': 'Morphological-Segmentation/it',
+        'cs': 'Morphological-Segmentation/cs',
+        'hu': 'Morphological-Segmentation/hu',
+        'mn': 'Morphological-Segmentation/mn',
+        'la': 'Morphological-Segmentation/la',
+    }
 
     def __init__(self, lang, load_pretrained=True, model_filepath=None, is_local=True):
         self.lang = lang
@@ -51,8 +61,8 @@ class MorphemeSegmenter:
                 self.sequence_labeller = SequenceLabeller.load(model_filepath, self.device)
 
         if model_filepath is None:
-            repo_id = f"{self.PRETRAINED_REPO_PREFIX}/{lang}"
-            filename = f"{lang}.safetensors"
+            repo_id = self.PRETRAINED_MODEL_LANGS_TO_HF_IDS[lang]
+            filename = f"{repo_id.split('/')[-1]}.safetensors"
             print(f"Attempting to load pretrained model from Hub: {repo_id}/{filename} for language '{lang}'.")
             model_file = hf_hub_download(repo_id=repo_id, filename=filename, cache_dir=None)
             self.sequence_labeller = SequenceLabeller.load(model_file, self.device)

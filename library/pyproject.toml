@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "morphseg"
-version = "0.2.0"
+version = "0.2.1"
 description = "A multilingual package for segmenting text into morphemes using supervised deep learning."
 readme = "README.md"
 authors = [
@@ -57,6 +57,7 @@ dependencies = [
     "editdistance>=0.6.0",
     "safetensors>=0.3.0",
     "huggingface-hub>=0.20.0",
+    "pytest>=7.0.0",
 ]
 
 [project.urls]
