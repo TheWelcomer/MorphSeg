@@ -286,7 +286,7 @@ class MorphemeSegmenter:
             tokens.append(token)
 
             if is_word:
-                normalized_token = self._normalize_for_morphology(token)
+                normalized_token = self.normalize_for_morphology(token)
                 word_tokens.append(list(normalized_token))
                 word_positions.append(len(tokens) - 1)
 
