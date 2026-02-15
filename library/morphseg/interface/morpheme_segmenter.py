@@ -21,7 +21,7 @@ from morphseg.training.dataset import RawDataset
 class MorphemeSegmenter:
     PRETRAINED_MODEL_LANGS = ['cs', 'en', 'es', 'fr', 'hu', 'it', 'la', 'mn', 'ru']
     PRETRAINED_MODEL_LANGS_TO_HF_IDS = {
-        'en': 'Morphological-Segmentation/en2',
+        'en': 'Morphological-Segmentation/en',
         'es': 'Morphological-Segmentation/es',
         'ru': 'Morphological-Segmentation/ru',
         'fr': 'Morphological-Segmentation/fr',
