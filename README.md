@@ -394,16 +394,35 @@ Given the input word "unhappiness", the model might output the following BIO tag
 Using these tags, we can reconstruct the segmented output as "un @@ happy @@ ness".
 
 ## Accuracy
-The following are the accuracy scores on the [SIGMORPHOM 2022 Shared Task](https://aclanthology.org/2022.sigmorphon-1.11.pdf) test sets for morpheme segmentation:
 
-| Language | Precision | Recall | F1 Score | Total Word Accuracy |
-|----------|-----------|--------|----------|---------------------|
-| en       | 0.9133    | 0.9132 | 0.9132   | 86.63%              |
-| es       | 0.9755    | 0.9731 | 0.9743   | 94.38%              |
-| ru       | 0.9549    | 0.9523 | 0.9536   | 87.47%              |
-| fr       | 0.9331    | 0.9294 | 0.9312   | 87.32%              |
-| it       | 0.9387    | 0.9361 | 0.9374   | 88.39%              |
-| cs       | 0.9384    | 0.9255 | 0.9319   | 85.80%              |
-| hu       | 0.9766    | 0.9842 | 0.9804   | 95.96%              |
-| mn       | 0.9774    | 0.9766 | 0.9770   | 95.95%              |
-| la       | 0.9824    | 0.9850 | 0.9837   | 97.44%              |
+The following are the accuracy scores on the SIGMORPHON 2022 Shared Task test sets for morpheme segmentation:
+
+| Language   | Precision | Recall | F1 Score | Total Word Accuracy |
+|------------|-----------|--------|----------|---------------------|
+| English    | 0.91      | 0.91   | 0.91     | 88.6%               |
+| Spanish    | 0.98      | 0.97   | 0.97     | 94.4%               |
+| Russian    | 0.95      | 0.95   | 0.95     | 87.5%               |
+| French     | 0.93      | 0.93   | 0.93     | 87.3%               |
+| Italian    | 0.94      | 0.94   | 0.94     | 88.4%               |
+| Czech      | 0.94      | 0.93   | 0.93     | 85.8%               |
+| Hungarian  | 0.98      | 0.98   | 0.98     | 96.0%               |
+| Mongolian  | 0.98      | 0.98   | 0.98     | 96.0%               |
+| Latin      | 0.98      | 0.99   | 0.98     | 97.4%               |
+
+## Performance Metrics
+
+Model size and inference speed for each language:
+
+| Language   | Model Size (MB) | Speed (Words/Second) |
+|------------|-----------------|----------------------|
+| English    | 12              | 462                  |
+| Spanish    | 12              | 819                  |
+| Russian    | 13              | 1,045                |
+| French     | 13              | 1,180                |
+| Italian    | 12              | 1,067                |
+| Czech      | 18              | 4,467                |
+| Hungarian  | 12              | 1,102                |
+| Mongolian  | 11              | 1,355                |
+| Latin      | 11              | 1,184                |
+
+Speed measured on MacBook Pro M4 Pro CPU.
