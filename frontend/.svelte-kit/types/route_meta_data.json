@@ -1,6 +1,0 @@
-{
-	"/": [
-		"src/routes/+layout.server.js",
-		"src/routes/+layout.server.js"
-	]
-}
