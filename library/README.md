@@ -415,14 +415,14 @@ Model size and inference speed for each language:
 
 | Language   | Model Size (MB) | Speed (Words/Second) |
 |------------|-----------------|----------------------|
-| English    | 12              | 462                  |
-| Spanish    | 12              | 819                  |
-| Russian    | 13              | 1,045                |
-| French     | 13              | 1,180                |
-| Italian    | 12              | 1,067                |
-| Czech      | 18              | 4,467                |
-| Hungarian  | 12              | 1,102                |
-| Mongolian  | 11              | 1,355                |
-| Latin      | 11              | 1,184                |
+| English    | 12              | 1,133                |
+| Spanish    | 12              | 1,063                |
+| Russian    | 13              | 969                  |
+| French     | 13              | 1,275                |
+| Italian    | 12              | 1,198                |
+| Czech      | 18              | 3,089                |
+| Hungarian  | 12              | 1,129                |
+| Mongolian  | 11              | 1,148                |
+| Latin      | 11              | 1,242                |
 
 Speed measured on MacBook Pro M4 Pro CPU.
