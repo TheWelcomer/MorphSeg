@@ -40,7 +40,7 @@ class SequenceLabeller:
             self.model = train(model=self.model.model, train_data=train_data, development_data=development_data, settings=self.settings)
         return self
 
-    def predict(self, sources: List[List[str]], features: Optional[List[List[str]]] = None) -> List[Prediction]:
+    def predict(self, sources: List[List[str]], features: Optional[List[List[str]]] = None, show_progress: bool = True) -> List[Prediction]:
         if self.model is None:
             raise RuntimeError("Running inference with uninitialised model")
 
@@ -55,7 +55,7 @@ class SequenceLabeller:
 
         predictions = []
 
-        for batch in tqdm(evaluation_dataloader, desc="Prediction Progress"):
+        for batch in tqdm(evaluation_dataloader, desc="Prediction Progress", disable=not show_progress):
             with torch.no_grad():
                 logits = self.model.model(
                     inputs=batch.sources, lengths=batch.source_lengths,
