@@ -1,17 +1,14 @@
 import torch
-import re
 import os
-import sys
 import collections
 import warnings
 import pandas as pd
 import unicodedata2
 import regex
-from typing import List, Union
 
-from importlib import resources
+from typing import List, Union
 from tqdm import tqdm
-from huggingface_hub import HfApi, hf_hub_download, upload_file
+from huggingface_hub import hf_hub_download
 from morphseg.interface.sequence_labeller import SequenceLabeller
 from morphseg.training.oracle import sent2rules, rules2sent
 from morphseg.utils.settings import Settings
@@ -72,7 +69,10 @@ class MorphemeSegmenter:
         self.sequence_labeller.model.model.device = self.device
         print(f"Model for language '{lang}' loaded successfully.")
 
-    def segment(self, text, output_string=False, delimiter=' @@') -> Union[str, List[List[str]]]:
+    def is_ready(self) -> bool:
+        return not self.sequence_labeller is None
+
+    def segment(self, text, output_string=False, delimiter=' @@', show_progress: bool = True) -> Union[str, List[List[str]]]:
         if self.sequence_labeller is None:
             raise RuntimeError("Model not trained. Please train the model before segmentation.")
         if type(text) is not str:
@@ -89,7 +89,7 @@ class MorphemeSegmenter:
         if not word_tokens:
             return [] if not output_string else text
 
-        predictions = self.sequence_labeller.predict(sources=word_tokens)
+        predictions = self.sequence_labeller.predict(sources=word_tokens, show_progress=show_progress)
         actions = [pred.prediction for pred in predictions]
         segmented = [
             rules2sent(source=word_tokens[i], actions=actions[i]).replace(' @@', delimiter)
@@ -107,6 +107,10 @@ class MorphemeSegmenter:
 
         return "".join(tokens)
 
+    # def batch_segment(self, text_list, output_string=False, delimiter=' @@') -> Union[str, List[List[str]]]:
+    #
+    #     pass
+
     def train(self, train_data_filepath: str, save_path: str, val_data_filepath=None, delimiter: str = ' @@', **kwargs) -> None:
         save_path = self._normalize_save_path(save_path)
         if self.sequence_labeller is None:
@@ -116,7 +120,7 @@ class MorphemeSegmenter:
             print(f"Fine-tuning existing model for language '{self.lang}'.")
             self._fine_tune(train_data_filepath, save_path, val_data_filepath, delimiter, **kwargs)
 
-    def eval(self, test_data_filepath: str, delimiter: str = ' @@') -> dict:
+    def eval(self, test_data_filepath: str, delimiter: str = ' @@', show_progress: bool = True) -> dict:
         """
         Evaluates the model on a test dataset using SIGMORPHON-compatible metrics.
         This function now calculates precision, recall, and F1 score based on the
@@ -126,7 +130,7 @@ class MorphemeSegmenter:
         test_data = self._load_data(test_data_filepath, delimiter)
         sources_test = test_data.sources
         targets_test = test_data.targets
-        predictions = self.sequence_labeller.predict(sources=sources_test)
+        predictions = self.sequence_labeller.predict(sources=sources_test, show_progress=show_progress)
 
         # Word-level accuracy (exact match on action labels)
         num_correct = 0

@@ -238,7 +238,7 @@ def evaluate_on_development_data(model: TrainedModel, development_data: Sequence
     return metrics
 
 
-def train(model: TrainedModel, train_data: RawDataset, development_data: Optional[RawDataset], settings: Settings) -> TrainedModel:
+def train(model: TrainedModel | None, train_data: RawDataset, development_data: Optional[RawDataset], settings: Settings) -> TrainedModel:
     if settings.verbose:
         logger.info("Prepare for Training")
         logger.info("Build vocabulary and datasets")
